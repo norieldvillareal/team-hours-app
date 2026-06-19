@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar"
 const primaryButton =
   "bg-[#71a3c1] text-white px-4 py-2 rounded-lg hover:opacity-90"
 
+const [name, setName] = useState("")
 
 
 const hourTypes = [
@@ -57,10 +58,10 @@ export default function AddEntryPage() {
 const handleSubmit = async () => {
   setMessage("")
 
-  if (!date || !hours || !type) {
-    setMessage("Please fill all required fields.")
-    return
-  }
+if (!name || !date || !hours || !type) {
+  setMessage("Please fill all required fields.")
+  return
+}
 
   if (Number(hours) > 24) {
     setMessage("Hours cannot exceed 24. Find a life!")
@@ -69,14 +70,15 @@ const handleSubmit = async () => {
 
   const { data, error } = await supabase
     .from("time_entries")
-    .insert([
-      {
-        date: date,
-        hours: Number(hours),
-        type: type,
-        notes: notes
-      }
-    ])
+.insert([
+  {
+    name: name,
+    date: date,
+    hours: Number(hours),
+    type: type,
+    notes: notes
+  }
+])
 
   if (error) {
     console.error("Database error:", error)
@@ -107,6 +109,20 @@ const handleSubmit = async () => {
             Add your work hours for a specific day
           </p>
         </div>
+
+<div>
+  <label className="block text-sm font-medium mb-1">
+    Your Name
+  </label>
+  <input
+    type="text"
+    value={name}
+    onChange={(e) => setName(e.target.value)}
+    className="w-full border border-gray-300 rounded-lg p-2 bg-white text-black"
+  />
+</div>
+
+
 
         {/* Date */}
         <div>
