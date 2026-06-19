@@ -4,8 +4,11 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { supabase } from "@/lib/supabaseClient"
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+
 
 export default function Navbar() {
+  const router = useRouter()
   const pathname = usePathname()
   const [user, setUser] = useState<any>(null)
 
@@ -68,7 +71,7 @@ export default function Navbar() {
           <button
             onClick={async () => {
               await supabase.auth.signOut()
-              window.location.href = "/login"
+              router.push("/login")
             }}
             className="text-sm text-white hover:underline"
           >

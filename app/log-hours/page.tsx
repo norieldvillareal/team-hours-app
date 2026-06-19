@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabaseClient"
 import Navbar from "@/components/Navbar"
+import { useRouter } from "next/navigation"
 
 export default function AddEntryPage() {
-
+const router = useRouter()
   // ✅ Allowed users
   const allowedUsers: Record<string, string> = {
     "socciano@pingala.eu": "Sarah Ammon Occiano",
@@ -52,13 +53,13 @@ export default function AddEntryPage() {
       const email = data.user?.email
 
       if (!email) {
-        window.location.href = "/login"
+        router.push("/login")
         return
       }
 
       if (!allowedUsers[email]) {
         alert("❌ You are not authorized to access this app")
-        window.location.href = "/login"
+        router.push("/login")
         return
       }
 

@@ -3,11 +3,12 @@
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabaseClient"
 import Navbar from "@/components/Navbar"
+import { useRouter } from "next/navigation"
 
 export default function AdminPage() {
 
   const ADMIN_EMAIL = "nvillareal@pingala.eu"
-
+const router = useRouter()
   const [entries, setEntries] = useState<any[]>([])
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -19,13 +20,13 @@ export default function AdminPage() {
       const email = data.user?.email
 
       if (!email) {
-        window.location.href = "/login"
+        router.push("/login")
         return
       }
 
       if (email !== ADMIN_EMAIL) {
         alert("❌ Admin access only")
-        window.location.href = "/log-hours"
+        router.push("/log-hours")
         return
       }
 

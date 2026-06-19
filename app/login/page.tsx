@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useRef } from "react"
 import { supabase } from "@/lib/supabaseClient"
+import { useRouter } from "next/navigation"
 
 export default function LoginPage() {
+  const router = useRouter()
   const [email, setEmail] = useState("")
   const [message, setMessage] = useState("")
   const [loading, setLoading] = useState(true)
@@ -15,7 +17,7 @@ export default function LoginPage() {
       const { data } = await supabase.auth.getUser()
 
       if (data.user) {
-        window.location.href = "/log-hours"
+        router.push("/log-hours")
       } else {
         setLoading(false)
         inputRef.current?.focus()

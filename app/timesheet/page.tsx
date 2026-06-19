@@ -3,8 +3,10 @@
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabaseClient"
 import Navbar from "@/components/Navbar"
+import { useRouter } from "next/navigation"
 
 export default function TimesheetPage() {
+  const router = useRouter()
   const [entries, setEntries] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
@@ -29,13 +31,13 @@ export default function TimesheetPage() {
       const email = data.user?.email
 
       if (!email) {
-        window.location.href = "/login"
+        router.push("/login")
         return
       }
 
       if (!allowedUsers[email]) {
         alert("❌ You are not authorized")
-        window.location.href = "/login"
+        router.push("/login")
         return
       }
 
