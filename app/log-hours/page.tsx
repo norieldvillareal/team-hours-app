@@ -6,9 +6,6 @@ import Navbar from "@/components/Navbar"
 const primaryButton =
   "bg-[#71a3c1] text-white px-4 py-2 rounded-lg hover:opacity-90"
 
-const [name, setName] = useState("")
-
-
 const hourTypes = [
   {
     name: "Pre-Shift",
@@ -49,6 +46,7 @@ const hourTypes = [
 ]
 
 export default function AddEntryPage() {
+  const [name, setName] = useState("")
   const [date, setDate] = useState("")
   const [hours, setHours] = useState("")
   const [type, setType] = useState("")
@@ -110,15 +108,17 @@ if (!name || !date || !hours || !type) {
           </p>
         </div>
 
+{/* Name */}
 <div>
   <label className="block text-sm font-medium mb-1">
     Your Name
   </label>
   <input
     type="text"
+    placeholder="Enter your name"
+    className="w-full border border-gray-300 rounded-lg p-2 bg-white text-black"
     value={name}
     onChange={(e) => setName(e.target.value)}
-    className="w-full border border-gray-300 rounded-lg p-2 bg-white text-black"
   />
 </div>
 
