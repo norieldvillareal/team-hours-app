@@ -6,12 +6,23 @@ import { supabase } from "@/lib/supabaseClient"
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [message, setMessage] = useState("")
+  const [loading, setLoading] = useState(true)
 
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // ✅ Auto-focus email field
   useEffect(() => {
-    inputRef.current?.focus()
+    const init = async () => {
+      const { data } = await supabase.auth.getUser()
+
+      if (data.user) {
+        window.location.href = "/log-hours"
+      } else {
+        setLoading(false)
+        inputRef.current?.focus()
+      }
+    }
+
+    init()
   }, [])
 
   const handleLogin = async () => {
@@ -34,12 +45,14 @@ export default function LoginPage() {
     }
   }
 
+  if (loading) {
+    return <div className="p-6">Checking session...</div>
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#c6dbdc]">
-
       <div className="bg-white p-8 rounded-xl shadow-xl w-full max-w-md text-center">
 
-        {/* ✅ LOGO (CIRCLE) */}
         <img
           src="/logo.jpg"
           alt="Company Logo"
@@ -54,7 +67,6 @@ export default function LoginPage() {
           Login using your work email
         </p>
 
-        {/* ✅ INPUT (READABLE + AUTOFOCUS) */}
         <input
           ref={inputRef}
           type="email"
@@ -66,7 +78,7 @@ export default function LoginPage() {
 
         <button
           onClick={handleLogin}
-          className="w-full bg-[#40948d] text-white py-3 rounded-lg hover:opacity-90 transition"
+          className="w-full bg-[#40948d] text-white py-3 rounded-lg hover:opacity-90"
         >
           Send Login Link
         </button>

@@ -6,7 +6,7 @@ import Navbar from "@/components/Navbar"
 
 export default function AddEntryPage() {
 
-  // ✅ Allowed users (email → display name)
+  // ✅ Allowed users
   const allowedUsers: Record<string, string> = {
     "socciano@pingala.eu": "Sarah Ammon Occiano",
     "rjavier@pingala.eu": "Romilyn Joy Javier",
@@ -36,6 +36,14 @@ export default function AddEntryPage() {
   const [message, setMessage] = useState("")
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+
+  // ✅ Ensure session is initialized
+  useEffect(() => {
+    const handleSession = async () => {
+      await supabase.auth.getSession()
+    }
+    handleSession()
+  }, [])
 
   // ✅ Auth + Access Control
   useEffect(() => {
@@ -85,10 +93,10 @@ export default function AddEntryPage() {
       .insert([
         {
           name: allowedUsers[user.email],
-          date: date,
+          date,
           hours: Number(hours),
-          type: type,
-          notes: notes,
+          type,
+          notes,
         },
       ])
 
@@ -100,13 +108,13 @@ export default function AddEntryPage() {
 
     setMessage("✅ Entry saved successfully.")
 
+    // ✅ Reset form
     setDate("")
     setHours("")
     setType("")
     setNotes("")
   }
 
-  // ✅ Loading guard (VERY IMPORTANT)
   if (loading) {
     return <div className="p-6">Loading...</div>
   }
@@ -126,12 +134,11 @@ export default function AddEntryPage() {
             Add your work hours for a specific day
           </p>
 
-          {/* ✅ Logged-in user */}
           <p className="text-sm mb-4 text-gray-600">
             Logged in as: {allowedUsers[user.email]}
           </p>
 
-          {/* Date */}
+          {/* ✅ Date */}
           <input
             type="date"
             className="w-full border rounded-lg p-2 mb-3"
@@ -139,7 +146,7 @@ export default function AddEntryPage() {
             onChange={(e) => setDate(e.target.value)}
           />
 
-          {/* Type */}
+          {/* ✅ Type */}
           <select
             className="w-full border rounded-lg p-2 mb-3"
             value={type}
@@ -156,7 +163,7 @@ export default function AddEntryPage() {
             <option value="Holiday Shift">Holiday Shift</option>
           </select>
 
-          {/* Hours */}
+          {/* ✅ Hours */}
           <input
             type="number"
             placeholder="Hours"
@@ -165,7 +172,7 @@ export default function AddEntryPage() {
             onChange={(e) => setHours(e.target.value)}
           />
 
-          {/* Notes */}
+          {/* ✅ Notes */}
           <textarea
             className="w-full border rounded-lg p-2 mb-3"
             placeholder="Notes"
@@ -173,15 +180,15 @@ export default function AddEntryPage() {
             onChange={(e) => setNotes(e.target.value)}
           />
 
-          {/* Buttons */}
+          {/* ✅ Button */}
           <button
             onClick={handleSubmit}
-            className="w-full bg-[#71a3c1] text-white py-2 rounded-lg"
+            className="w-full bg-[#71a3c1] text-white py-2 rounded-lg hover:opacity-90"
           >
             Add Entry
           </button>
 
-          {/* Message */}
+          {/* ✅ Message */}
           {message && (
             <p className="text-sm mt-3 text-center">
               {message}
