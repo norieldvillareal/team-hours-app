@@ -6,10 +6,22 @@ import Navbar from "@/components/Navbar"
 import { useRouter } from "next/navigation"
 
 export default function TimesheetPage() {
+  const [sortColumn, setSortColumn] = useState("")
+  const [sortDirection, setSortDirection] = useState("asc")
   const router = useRouter()
   const [entries, setEntries] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
+
+  const handleSort = (column: string) => {
+  if (sortColumn === column) {
+    setSortDirection(sortDirection === "asc" ? "desc" : "asc")
+  } else {
+    setSortColumn(column)
+    setSortDirection("asc")
+  }
+}
+
 
   const [selectedMonth, setSelectedMonth] = useState(
     new Date().toISOString().slice(0, 7)
@@ -19,11 +31,46 @@ export default function TimesheetPage() {
   const [showConfirm, setShowConfirm] = useState(false)
   const [editingEntry, setEditingEntry] = useState<any>(null)
 
+  // ✅ Allowed users
   const allowedUsers: Record<string, string> = {
-    "nvillareal@pingala.eu": "Noriel Villareal",
+    "socciano@pingala.eu": "Sarah Ammon Occiano",
+    "rjavier@pingala.eu": "Romilyn Joy Javier",
+    "dvillanueva@pingala.eu": "Diane Villanueva",
+    "kquilay@pingala.eu": "Kinverly Rhazmen Quilay",
+    "ksaquing@pingala.eu": "Krizza Fatima Saquing",
     "nabesamis@pingala.eu": "Niel Joseph Abesamis",
+    "ffaruqui@pingala.eu": "Faraz Faruqui",
+    "jcruz@pingala.eu": "Joyce Monica Cruz",
+    "athomas@pingala.eu": "Anu Thomas",
+    "hgadepalli@pingala.eu": "Harshil Gadepalli",
+    "skrishnan@pingala.eu": "Sagar Krishnan",
+    "rgogineni@pingala.eu": "Rahul Gogineni",
+    "polarte@pingala.eu": "Patricia Olarte",
+    "cmartinez@pingala.eu": "Cleive Martinez",
+    "rlata@pingala.eu": "Rosemarie Elaine Lata",
+    "rvelasco@pingala.eu": "Richard Mon Velasco",
+    "nvillareal@pingala.eu": "Noriel Villareal",
     "norieldvillareal@gmail.com": "Noriel GMAIL",
   }
+
+  const sortEntries = (data: any[]) => {
+  if (!sortColumn) return data
+
+  return [...data].sort((a, b) => {
+    let valA = a[sortColumn]
+    let valB = b[sortColumn]
+
+    if (sortColumn === "hours") {
+      valA = Number(valA)
+      valB = Number(valB)
+    }
+
+    if (valA < valB) return sortDirection === "asc" ? -1 : 1
+    if (valA > valB) return sortDirection === "asc" ? 1 : -1
+    return 0
+  })
+}
+
 
   useEffect(() => {
     const getUser = async () => {
@@ -91,7 +138,7 @@ if (selectedMonth) {
 
     const { data } = await query.order("date", { ascending: false })
 
-    setEntries(data || [])
+    setEntries(sortEntries(data || []))
     setLoading(false)
   }
 
@@ -229,16 +276,23 @@ if (selectedMonth) {
 
           {/* TABLE */}
           <table className="w-full text-sm border">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="p-2">Date</th>
-                <th className="p-2">Type</th>
-                <th className="p-2">Hours</th>
-                <th className="p-2">Status</th>
-                <th className="p-2">Notes</th>
-                <th className="p-2">Actions</th>
-              </tr>
-            </thead>
+<thead className="bg-gray-100">
+  <tr>
+    <th className="p-2 cursor-pointer" onClick={() => handleSort("date")}>
+      Date ⬍
+    </th>
+    <th className="p-2 cursor-pointer" onClick={() => handleSort("type")}>
+      Type ⬍
+    </th>
+    <th className="p-2 cursor-pointer" onClick={() => handleSort("hours")}>
+      Hours ⬍
+    </th>
+    <th className="p-2">Status</th>
+    <th className="p-2">Notes</th>
+    <th className="p-2">Actions</th>
+  </tr>
+</thead>
+
 
             <tbody>
               {entries.map((entry) => (

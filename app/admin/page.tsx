@@ -6,9 +6,37 @@ import Navbar from "@/components/Navbar"
 import { useRouter } from "next/navigation"
 
 export default function AdminPage() {
-
+  const [sortColumn, setSortColumn] = useState("")
+  const [sortDirection, setSortDirection] = useState("asc")
   const ADMIN_EMAIL = "nvillareal@pingala.eu"
   const router = useRouter()
+
+  const handleSort = (column: string) => {
+  if (sortColumn === column) {
+    setSortDirection(sortDirection === "asc" ? "desc" : "asc")
+  } else {
+    setSortColumn(column)
+    setSortDirection("asc")
+  }
+}
+
+  const sortEntries = (data: any[]) => {
+  if (!sortColumn) return data
+
+  return [...data].sort((a, b) => {
+    let valA = a[sortColumn]
+    let valB = b[sortColumn]
+
+    if (sortColumn === "hours") {
+      valA = Number(valA)
+      valB = Number(valB)
+    }
+
+    if (valA < valB) return sortDirection === "asc" ? -1 : 1
+    if (valA > valB) return sortDirection === "asc" ? 1 : -1
+    return 0
+  })
+}
 
   const [entries, setEntries] = useState<any[]>([])
   const [user, setUser] = useState<any>(null)
@@ -85,7 +113,7 @@ if (selectedMonth) {
 
     const { data } = await query.order("date", { ascending: false })
 
-    setEntries(data || [])
+    setEntries(sortEntries(data || []))
     setLoading(false)
   }
 
@@ -201,10 +229,19 @@ if (selectedMonth) {
           <table className="w-full text-sm border">
             <thead className="bg-gray-200">
               <tr>
-                <th className="p-2 text-left">Date</th>
-                <th className="p-2 text-left">Name</th>
-                <th className="p-2 text-left">Type</th>
-                <th className="p-2 text-left">Hours</th>
+    <th className="p-2 cursor-pointer" onClick={() => handleSort("date")}>
+      Date ⬍
+    </th>
+    <th className="p-2 cursor-pointer" onClick={() => handleSort("date")}>
+      Name ⬍
+    </th>
+
+    <th className="p-2 cursor-pointer" onClick={() => handleSort("date")}>
+      Type ⬍
+    </th>
+    <th className="p-2 cursor-pointer" onClick={() => handleSort("date")}>
+      Hours ⬍
+    </th>
               </tr>
             </thead>
 
