@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabaseClient"
 import Navbar from "@/components/Navbar"
 const primaryButton =
@@ -46,17 +46,67 @@ const hourTypes = [
 ]
 
 export default function AddEntryPage() {
+  const allowedUsers: Record<string, string> = {
+  "socciano@pingala.eu": "Sarah Ammon Occiano",
+  "rjavier@pingala.eu": "Romilyn Joy Javier",
+  "dvillanueva@pingala.eu": "Diane Villanueva",
+  "kquilay@pingala.eu": "Kinverly Rhazmen Quilay",
+  "ksaquing@pingala.eu": "Krizza Fatima Saquing",
+  "nabesamis@pingala.eu": "Niel Joseph Abesamis",
+  "ffaruqui@pingala.eu": "Faraz Faruqui",
+  "jcruz@pingala.eu": "Joyce Monica Cruz",
+  "athomas@pingala.eu": "Anu Thomas",
+  "hgadepalli@pingala.eu": "Harshil Gadepalli",
+  "skrishnan@pingala.eu": "Sagar Krishnan",
+  "rgogineni@pingala.eu": "Rahul Gogineni",
+  "polarte@pingala.eu": "Patricia Olarte",
+  "cmartinez@pingala.eu": "Cleive Martinez",
+  "rlata@pingala.eu": "Rosemarie Elaine Lata",
+  "rvelasco@pingala.eu": "Richard Mon Velasco",
+  "nvillareal@pingala.eu": "Noriel Villareal",
+  "rebeccajoydvillareal@gmail.com": "Rebecca Joy Villareal",
+}
   const [name, setName] = useState("")
   const [date, setDate] = useState("")
   const [hours, setHours] = useState("")
   const [type, setType] = useState("")
   const [notes, setNotes] = useState("")
   const [message, setMessage] = useState("")
+  const [user, setUser] = useState<any>(null)
+
+useEffect(() => {
+  const getUser = async () => {
+    const { data } = await supabase.auth.getUser()
+    const email = data.user?.email
+
+    if (!email) {
+      window.location.href = "/login"
+      return
+    }
+
+    if (!allowedUsers[email]) {
+      alert("❌ You are not authorized to access this app")
+      window.location.href = "/login"
+      return
+    }
+
+    setUser(data.user)
+  }
+
+  getUser()
+}, [])
+
 
 const handleSubmit = async () => {
   setMessage("")
 
-if (!name || !date || !hours || !type) {
+if (!user) {
+  setMessage("❌ Please login first.")
+  return
+}
+
+
+if (!date || !hours || !type) {
   setMessage("Please fill all required fields.")
   return
 }
@@ -70,7 +120,7 @@ if (!name || !date || !hours || !type) {
     .from("time_entries")
 .insert([
   {
-    name: name,
+    name: allowedUsers[user?.email || ""],
     date: date,
     hours: Number(hours),
     type: type,
@@ -106,21 +156,13 @@ if (!name || !date || !hours || !type) {
           <p className="text-sm text-gray-700">
             Add your work hours for a specific day
           </p>
-        </div>
+          <br></br>
+<p className="text-sm mb-3 text-gray-600">
+  Logged in as: {allowedUsers[user?.email || ""]}
+</p>
 
-{/* Name */}
-<div>
-  <label className="block text-sm font-medium mb-1">
-    Your Name
-  </label>
-  <input
-    type="text"
-    placeholder="Enter your name"
-    className="w-full border border-gray-300 rounded-lg p-2 bg-white text-black"
-    value={name}
-    onChange={(e) => setName(e.target.value)}
-  />
-</div>
+<br></br>
+        </div>
 
 
 
