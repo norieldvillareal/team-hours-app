@@ -1,0 +1,41 @@
+[33mcommit 1f8171f67be6c9c72dffa0200f6bf60864e2753b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: Noriel Villareal <norieldvillareal@gmail.com>
+Date:   Fri Jun 19 23:46:01 2026 +0800
+
+    clean auth + access control
+
+[33mcommit 913d86746da38c131d013cc1c0266cdb499c955a[m
+Author: Noriel Villareal <norieldvillareal@gmail.com>
+Date:   Fri Jun 19 22:59:45 2026 +0800
+
+    fix login redirect
+
+[33mcommit a31c8c768c690606133c4cfb86ceba6da77de18b[m
+Author: Noriel Villareal <norieldvillareal@gmail.com>
+Date:   Fri Jun 19 22:34:40 2026 +0800
+
+    fix hook placement
+
+[33mcommit 4bb819cbb788e070056f8122e6d6f8ca8ce091a1[m
+Author: Noriel Villareal <norieldvillareal@gmail.com>
+Date:   Fri Jun 19 22:23:55 2026 +0800
+
+    add auth + user display + access control
+
+[33mcommit 9a03e405ccc8b37ad84009dc5684fa9c4b6fbb4d[m
+Author: Noriel Villareal <norieldvillareal@gmail.com>
+Date:   Fri Jun 19 21:33:07 2026 +0800
+
+    fix hook placement
+
+[33mcommit ed79fe9b91334fcc7ea931d4e8acee1e859796dc[m
+Author: Noriel Villareal <norieldvillareal@gmail.com>
+Date:   Fri Jun 19 21:21:35 2026 +0800
+
+    add name input
+
+[33mcommit 84fb98db73dfbc6991c78c10e94daf6ffd0707b7[m
+Author: Noriel Villareal <norieldvillareal@gmail.com>
+Date:   Fri Jun 19 20:54:37 2026 +0800
+
+    initial commit

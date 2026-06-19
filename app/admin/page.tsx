@@ -59,18 +59,6 @@ export default function AdminPage() {
     <div className="min-h-screen bg-[#c6dbdc] text-black">
       <Navbar />
 
-<div className="max-w-5xl mx-auto p-6 flex justify-end">
-  <button
-    onClick={async () => {
-      await supabase.auth.signOut()
-      window.location.href = "/login"
-    }}
-    className="text-sm text-red-500 hover:underline"
-  >
-    Logout
-  </button>
-</div>
-
 
       <div className="max-w-5xl mx-auto p-6">
         <div className="bg-white p-6 rounded-xl shadow-xl border">
