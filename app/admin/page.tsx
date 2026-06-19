@@ -57,11 +57,27 @@ export default function AdminPage() {
 
     const endDate = `${selectedMonth}-${lastDay}`
 
-    let query = supabase
-      .from("time_entries")
-      .select("*")
-      .gte("date", startDate)
-      .lte("date", endDate)
+let query = supabase
+  .from("time_entries")
+  .select("*")
+
+// ✅ ONLY apply date filter if month is selected
+if (selectedMonth) {
+  const startDate = `${selectedMonth}-01`
+
+  const lastDay = new Date(
+    new Date(selectedMonth + "-01").getFullYear(),
+    new Date(selectedMonth + "-01").getMonth() + 1,
+    0
+  ).getDate()
+
+  const endDate = `${selectedMonth}-${lastDay}`
+
+  query = query
+    .gte("date", startDate)
+    .lte("date", endDate)
+}
+
 
     if (selectedType !== "All") {
       query = query.eq("type", selectedType)
