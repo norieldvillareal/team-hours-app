@@ -8,10 +8,17 @@ import { useRouter } from "next/navigation"
 export default function AdminPage() {
 
   const ADMIN_EMAIL = "nvillareal@pingala.eu"
-const router = useRouter()
+  const router = useRouter()
+
   const [entries, setEntries] = useState<any[]>([])
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+
+  // ✅ FILTER STATES (ADDED)
+  const [selectedMonth, setSelectedMonth] = useState(
+    new Date().toISOString().slice(0, 7)
+  )
+  const [selectedType, setSelectedType] = useState("All")
 
   // ✅ Auth + Admin check
   useEffect(() => {
@@ -35,32 +42,45 @@ const router = useRouter()
     }
 
     checkUser()
-  }, [])
+  }, [selectedMonth, selectedType]) // ✅ IMPORTANT
 
-  // ✅ Fetch ALL entries (admin only)
+  // ✅ Fetch entries WITH FILTERS
   const fetchEntries = async () => {
-    const { data, error } = await supabase
+
+    const startDate = `${selectedMonth}-01`
+
+    const lastDay = new Date(
+      new Date(selectedMonth + "-01").getFullYear(),
+      new Date(selectedMonth + "-01").getMonth() + 1,
+      0
+    ).getDate()
+
+    const endDate = `${selectedMonth}-${lastDay}`
+
+    let query = supabase
       .from("time_entries")
       .select("*")
-      .order("date", { ascending: false })
+      .gte("date", startDate)
+      .lte("date", endDate)
 
-    if (!error) {
-      setEntries(data || [])
+    if (selectedType !== "All") {
+      query = query.eq("type", selectedType)
     }
 
+    const { data } = await query.order("date", { ascending: false })
+
+    setEntries(data || [])
     setLoading(false)
   }
 
   // ✅ Loading guard
-if (loading) {
-  return <div className="min-h-screen bg-[#c6dbdc]" />
-}
-
+  if (loading) {
+    return <div className="min-h-screen bg-[#c6dbdc]" />
+  }
 
   return (
     <div className="min-h-screen bg-[#c6dbdc] text-black">
       <Navbar />
-
 
       <div className="max-w-5xl mx-auto p-6">
         <div className="bg-white p-6 rounded-xl shadow-xl border">
@@ -69,47 +89,97 @@ if (loading) {
             Admin - Team Overview
           </h1>
 
-          {/* ✅ Logged in user */}
           <p className="text-sm mb-4 text-gray-600">
             Logged in as: {user?.email}
           </p>
 
-<div className="mb-4 flex justify-end">
-  <button
-  onClick={() => {
-    // ✅ Header row
-    const header = "Date,Name,Type,Hours\n"
+          {/* ✅ FILTERS (ADDED BACK) */}
+          <div className="mb-4 grid grid-cols-2 gap-3">
 
-    // ✅ Data rows
-    const rows = entries
-      .map(
-        (e) =>
-          `${e.date},${e.name},${e.type},${e.hours}`
-      )
-      .join("\n")
+            <div>
+              <label className="block text-sm mb-1">Month</label>
+              <input
+                type="month"
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+                className="w-full border rounded-lg p-2"
+              />
+            </div>
 
-    // ✅ Create file
-    const blob = new Blob([header + rows], {
-      type: "text/csv;charset=utf-8;",
-    })
+            <div>
+              <label className="block text-sm mb-1">Type</label>
+              <select
+                value={selectedType}
+                onChange={(e) => setSelectedType(e.target.value)}
+                className="w-full border rounded-lg p-2"
+              >
+                <option value="All">All</option>
+                <option value="Pre-Shift">Pre-Shift</option>
+                <option value="Post-Shift">Post-Shift</option>
+                <option value="Night Shift">Night Shift</option>
+                <option value="Weekend HC">Weekend HC</option>
+                <option value="Weekend Shift">Weekend Shift</option>
+                <option value="Weekend Release">Weekend Release</option>
+                <option value="Weekend Patching">Weekend Patching</option>
+                <option value="Holiday Shift">Holiday Shift</option>
+              </select>
+            </div>
 
-    const url = URL.createObjectURL(blob)
+          </div>
 
-    // ✅ Download
-    const link = document.createElement("a")
-    link.href = url
-    link.download = `OT_Report_${new Date()
-      .toISOString()
-      .slice(0, 10)}.xlsx` // 👈 looks like Excel
-    link.click()
-  }}
-  className="bg-[#71a3c1] text-white px-4 py-2 rounded-lg hover:opacity-90"
->
-  Export Excel
-</button>
+          {/* ✅ REAL EXCEL EXPORT (FIXED) */}
+          <div className="mb-4 flex justify-end">
+            <button
+              onClick={() => {
 
-</div>
+                const rows = entries.map(e => `
+                  <Row>
+                    <Cell><Data ss:Type="String">${e.date}</Data></Cell>
+                    <Cell><Data ss:Type="String">${e.name}</Data></Cell>
+                    <Cell><Data ss:Type="String">${e.type}</Data></Cell>
+                    <Cell><Data ss:Type="Number">${e.hours}</Data></Cell>
+                  </Row>
+                `).join("")
 
+                const xml = `
+                  <?xml version="1.0"?>
+                  <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+                    xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+                    <Worksheet ss:Name="OT Report">
+                      <Table>
+
+                        <Row>
+                          <Cell><Data ss:Type="String">Date</Data></Cell>
+                          <Cell><Data ss:Type="String">Name</Data></Cell>
+                          <Cell><Data ss:Type="String">Type</Data></Cell>
+                          <Cell><Data ss:Type="String">Hours</Data></Cell>
+                        </Row>
+
+                        ${rows}
+
+                      </Table>
+                    </Worksheet>
+                  </Workbook>
+                `
+
+                const blob = new Blob([xml], {
+                  type: "application/vnd.ms-excel",
+                })
+
+                const url = URL.createObjectURL(blob)
+
+                const link = document.createElement("a")
+                link.href = url
+                link.download = `OT_Report_${new Date()
+                  .toISOString()
+                  .slice(0, 10)}.xls`
+                link.click()
+              }}
+              className="bg-[#71a3c1] text-white px-4 py-2 rounded-lg hover:opacity-90"
+            >
+              Export Excel
+            </button>
+          </div>
 
           {/* ✅ Table */}
           <table className="w-full text-sm border">
