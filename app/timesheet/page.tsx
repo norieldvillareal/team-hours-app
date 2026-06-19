@@ -139,7 +139,10 @@ export default function TimesheetPage() {
     fetchEntries(user.email)
   }
 
-  if (loading) return <div className="p-6">Loading...</div>
+  //if (loading) return <div className="p-6">Loading...</div>
+  if (loading) {
+  return <div className="min-h-screen bg-[#c6dbdc]" />
+}
 
   return (
     <div className="min-h-screen bg-[#c6dbdc] text-black">

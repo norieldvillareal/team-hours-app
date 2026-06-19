@@ -47,9 +47,10 @@ export default function LoginPage() {
     }
   }
 
-  if (loading) {
-    return <div className="p-6">Checking session...</div>
-  }
+if (loading) {
+  return <div className="min-h-screen bg-[#c6dbdc]" />
+}
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#c6dbdc]">
