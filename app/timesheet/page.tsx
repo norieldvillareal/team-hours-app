@@ -95,6 +95,10 @@ export default function TimesheetPage() {
     getUser()
   }, [selectedMonth, selectedType])
 
+  useEffect(() => {
+  setEntries((prev) => sortEntries(prev))
+}, [sortColumn, sortDirection])
+
   const fetchEntries = async (email: string) => {
     setLoading(true)
 
@@ -113,6 +117,8 @@ export default function TimesheetPage() {
 let query = supabase
   .from("time_entries")
   .select("*")
+  .eq("name", userName)
+
 
 // ✅ ONLY apply date filter if month is selected
 if (selectedMonth) {

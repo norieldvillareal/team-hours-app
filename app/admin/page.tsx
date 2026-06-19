@@ -72,6 +72,10 @@ export default function AdminPage() {
     checkUser()
   }, [selectedMonth, selectedType]) // ✅ IMPORTANT
 
+  useEffect(() => {
+  setEntries((prev) => sortEntries(prev))
+}, [sortColumn, sortDirection])
+
   // ✅ Fetch entries WITH FILTERS
   const fetchEntries = async () => {
 
