@@ -39,10 +39,14 @@ export default function LoginPage() {
 
       <div className="bg-white p-8 rounded-xl shadow-xl w-full max-w-md text-center">
 
-        {/* ✅ LOGO */}
-        /logo.png
+        {/* ✅ LOGO (CIRCLE) */}
+        <img
+          src="/logo.jpg"
+          alt="Company Logo"
+          className="w-20 h-20 rounded-full object-cover border-2 border-[#40948d] mx-auto mb-4"
+        />
 
-        <h1 className="text-2xl font-semibold mb-2">
+        <h1 className="text-2xl font-semibold mb-2 text-gray-800">
           Team Hours
         </h1>
 
@@ -50,12 +54,12 @@ export default function LoginPage() {
           Login using your work email
         </p>
 
-        {/* ✅ INPUT WITH AUTOFOCUS */}
+        {/* ✅ INPUT (READABLE + AUTOFOCUS) */}
         <input
           ref={inputRef}
           type="email"
           placeholder="yourname@pingala.eu"
-          className="w-full border border-gray-300 rounded-lg p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-[#40948d]"
+          className="w-full border border-gray-300 rounded-lg p-3 mb-4 text-black placeholder-gray-400 bg-white focus:outline-none focus:ring-2 focus:ring-[#40948d]"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
