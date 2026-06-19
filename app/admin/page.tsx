@@ -72,6 +72,28 @@ export default function AdminPage() {
             Logged in as: {user?.email}
           </p>
 
+<div className="mb-4 flex justify-end">
+  <button
+    onClick={() => {
+      const csv = entries
+        .map(e => `${e.date},${e.name},${e.type},${e.hours}`)
+        .join("\n")
+
+      const blob = new Blob([csv], { type: "text/csv" })
+      const url = URL.createObjectURL(blob)
+
+      const a = document.createElement("a")
+      a.href = url
+      a.download = "ot_report.csv"
+      a.click()
+    }}
+    className="bg-[#71a3c1] text-white px-4 py-2 rounded-lg"
+  >
+    Export CSV
+  </button>
+</div>
+
+
           {/* ✅ Table */}
           <table className="w-full text-sm border">
             <thead className="bg-gray-200">

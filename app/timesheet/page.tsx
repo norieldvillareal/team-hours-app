@@ -15,30 +15,14 @@ export default function TimesheetPage() {
   const [selectedType, setSelectedType] = useState("All")
   const [message, setMessage] = useState("")
   const [showConfirm, setShowConfirm] = useState(false)
+  const [editingEntry, setEditingEntry] = useState<any>(null)
 
-  // ✅ SAME mapping as log-hours
   const allowedUsers: Record<string, string> = {
-    "socciano@pingala.eu": "Sarah Ammon Occiano",
-    "rjavier@pingala.eu": "Romilyn Joy Javier",
-    "dvillanueva@pingala.eu": "Diane Villanueva",
-    "kquilay@pingala.eu": "Kinverly Rhazmen Quilay",
-    "ksaquing@pingala.eu": "Krizza Fatima Saquing",
-    "nabesamis@pingala.eu": "Niel Joseph Abesamis",
-    "ffaruqui@pingala.eu": "Faraz Faruqui",
-    "jcruz@pingala.eu": "Joyce Monica Cruz",
-    "athomas@pingala.eu": "Anu Thomas",
-    "hgadepalli@pingala.eu": "Harshil Gadepalli",
-    "skrishnan@pingala.eu": "Sagar Krishnan",
-    "rgogineni@pingala.eu": "Rahul Gogineni",
-    "polarte@pingala.eu": "Patricia Olarte",
-    "cmartinez@pingala.eu": "Cleive Martinez",
-    "rlata@pingala.eu": "Rosemarie Elaine Lata",
-    "rvelasco@pingala.eu": "Richard Mon Velasco",
     "nvillareal@pingala.eu": "Noriel Villareal",
+    "nabesamis@pingala.eu": "Niel Joseph Abesamis",
     "norieldvillareal@gmail.com": "Noriel GMAIL",
   }
 
-  // ✅ AUTH FIRST
   useEffect(() => {
     const getUser = async () => {
       const { data } = await supabase.auth.getUser()
@@ -62,46 +46,37 @@ export default function TimesheetPage() {
     getUser()
   }, [selectedMonth, selectedType])
 
-  // ✅ FILTER BY USER (THIS IS THE FIX)
-const fetchEntries = async (email: string) => {
-  setLoading(true)
+  const fetchEntries = async (email: string) => {
+    setLoading(true)
 
-  const userName = allowedUsers[email]
+    const userName = allowedUsers[email]
 
-  // ✅ ADD THESE BACK
-  const startDate = `${selectedMonth}-01`
+    const startDate = `${selectedMonth}-01`
 
-  const lastDay = new Date(
-    new Date(selectedMonth + "-01").getFullYear(),
-    new Date(selectedMonth + "-01").getMonth() + 1,
-    0
-  ).getDate()
+    const lastDay = new Date(
+      new Date(selectedMonth + "-01").getFullYear(),
+      new Date(selectedMonth + "-01").getMonth() + 1,
+      0
+    ).getDate()
 
-  const endDate = `${selectedMonth}-${lastDay}`
+    const endDate = `${selectedMonth}-${lastDay}`
 
-  // ✅ QUERY
-  let query = supabase
-    .from("time_entries")
-    .select("*")
-    .eq("name", userName)
-    .gte("date", startDate)
-    .lte("date", endDate)
+    let query = supabase
+      .from("time_entries")
+      .select("*")
+      .eq("name", userName)
+      .gte("date", startDate)
+      .lte("date", endDate)
 
-  if (selectedType !== "All") {
-    query = query.eq("type", selectedType)
-  }
+    if (selectedType !== "All") {
+      query = query.eq("type", selectedType)
+    }
 
-  const { data, error } = await query.order("date", {
-    ascending: false,
-  })
+    const { data } = await query.order("date", { ascending: false })
 
-  if (!error) {
     setEntries(data || [])
+    setLoading(false)
   }
-
-  setLoading(false)
-}
-
 
   const totalHours = entries.reduce(
     (sum, entry) => sum + (Number(entry.hours) || 0),
@@ -112,6 +87,7 @@ const fetchEntries = async (email: string) => {
     entries.length > 0 &&
     entries.every((entry) => entry.status === "Submitted")
 
+  // ✅ SUBMIT
   const handleSubmitTimesheet = async () => {
     const userName = allowedUsers[user.email]
 
@@ -125,24 +101,43 @@ const fetchEntries = async (email: string) => {
 
     const endDate = `${selectedMonth}-${lastDay}`
 
-    const { error } = await supabase
+    await supabase
       .from("time_entries")
       .update({ status: "Submitted" })
       .eq("name", userName)
       .gte("date", startDate)
       .lte("date", endDate)
 
-    if (error) {
-      setMessage("❌ Failed to submit OT hours")
-    } else {
-      setMessage("✅ OT hours submitted")
-      fetchEntries(user.email)
-    }
+    setMessage("✅ OT hours submitted")
+    fetchEntries(user.email)
   }
 
-  if (loading) {
-    return <div className="p-6">Loading...</div>
+  // ✅ DELETE
+  const handleDelete = async (id: number) => {
+    await supabase.from("time_entries").delete().eq("id", id)
+    setMessage("✅ Entry deleted")
+    fetchEntries(user.email)
   }
+
+  // ✅ UPDATE
+  const handleUpdate = async () => {
+    if (!editingEntry) return
+
+    await supabase
+      .from("time_entries")
+      .update({
+        date: editingEntry.date,
+        hours: editingEntry.hours,
+        notes: editingEntry.notes,
+      })
+      .eq("id", editingEntry.id)
+
+    setEditingEntry(null)
+    setMessage("✅ Entry updated")
+    fetchEntries(user.email)
+  }
+
+  if (loading) return <div className="p-6">Loading...</div>
 
   return (
     <div className="min-h-screen bg-[#c6dbdc] text-black">
@@ -159,18 +154,35 @@ const fetchEntries = async (email: string) => {
             Logged in as: {allowedUsers[user.email]}
           </p>
 
-          <div className="mb-4">
-            Total Hours: <strong>{totalHours}</strong>
+          {/* HEADER */}
+          <div className="mb-4 flex justify-between items-center">
+            <div className="text-lg">
+              Total Hours: <strong>{totalHours}</strong>
+            </div>
+
+            <button
+              onClick={() => setShowConfirm(true)}
+              disabled={isSubmitted}
+              className={`px-4 py-2 rounded-lg text-white ${
+                isSubmitted
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-[#71a3c1]"
+              }`}
+            >
+              {isSubmitted ? "Already Submitted" : "Submit OT Hours"}
+            </button>
           </div>
 
+          {/* TABLE */}
           <table className="w-full text-sm border">
             <thead className="bg-gray-100">
               <tr>
-                <th className="p-2 text-left">Date</th>
-                <th className="p-2 text-left">Type</th>
-                <th className="p-2 text-left">Hours</th>
-                <th className="p-2 text-left">Status</th>
-                <th className="p-2 text-left">Notes</th>
+                <th className="p-2">Date</th>
+                <th className="p-2">Type</th>
+                <th className="p-2">Hours</th>
+                <th className="p-2">Status</th>
+                <th className="p-2">Notes</th>
+                <th className="p-2">Actions</th>
               </tr>
             </thead>
 
@@ -182,6 +194,27 @@ const fetchEntries = async (email: string) => {
                   <td className="p-2">{entry.hours}</td>
                   <td className="p-2">{entry.status || "Draft"}</td>
                   <td className="p-2">{entry.notes}</td>
+
+                  <td className="p-2">
+                    {entry.status !== "Submitted" && (
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setEditingEntry(entry)}
+                          className="text-blue-500 text-xs"
+                        >
+                          Edit
+                        </button>
+
+                        <button
+                          onClick={() => handleDelete(entry.id)}
+                          className="text-red-500 text-xs"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    )}
+                  </td>
+
                 </tr>
               ))}
             </tbody>
@@ -189,6 +222,70 @@ const fetchEntries = async (email: string) => {
 
         </div>
       </div>
+
+      {/* ✅ SUBMIT MODAL */}
+      {showConfirm && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-xl">
+
+            <h2 className="mb-4">Confirm submission?</h2>
+
+            <div className="flex gap-2">
+              <button onClick={() => setShowConfirm(false)}>
+                Cancel
+              </button>
+
+              <button
+                onClick={async () => {
+                  await handleSubmitTimesheet()
+                  setShowConfirm(false)
+                }}
+              >
+                Confirm
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* ✅ EDIT MODAL */}
+      {editingEntry && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-xl">
+
+            <h2>Edit Entry</h2>
+
+            <input
+              type="date"
+              value={editingEntry.date}
+              onChange={(e) =>
+                setEditingEntry({ ...editingEntry, date: e.target.value })
+              }
+            />
+
+            <input
+              type="number"
+              value={editingEntry.hours}
+              onChange={(e) =>
+                setEditingEntry({ ...editingEntry, hours: e.target.value })
+              }
+            />
+
+            <textarea
+              value={editingEntry.notes}
+              onChange={(e) =>
+                setEditingEntry({ ...editingEntry, notes: e.target.value })
+              }
+            />
+
+            <button onClick={handleUpdate}>Save</button>
+            <button onClick={() => setEditingEntry(null)}>Cancel</button>
+
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }
