@@ -250,41 +250,74 @@ export default function TimesheetPage() {
       )}
 
       {/* ✅ EDIT MODAL */}
-      {editingEntry && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-xl">
+{editingEntry && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+    
+    <div className="bg-white rounded-xl p-6 w-full max-w-md shadow-lg">
 
-            <h2>Edit Entry</h2>
+      <h2 className="text-lg font-semibold mb-4">
+        Edit Entry
+      </h2>
 
-            <input
-              type="date"
-              value={editingEntry.date}
-              onChange={(e) =>
-                setEditingEntry({ ...editingEntry, date: e.target.value })
-              }
-            />
+      {/* ✅ DATE */}
+      <div className="mb-3">
+        <label className="block text-sm mb-1">Date</label>
+        <input
+          type="date"
+          value={editingEntry.date}
+          onChange={(e) =>
+            setEditingEntry({ ...editingEntry, date: e.target.value })
+          }
+          className="w-full border rounded-lg p-2"
+        />
+      </div>
 
-            <input
-              type="number"
-              value={editingEntry.hours}
-              onChange={(e) =>
-                setEditingEntry({ ...editingEntry, hours: e.target.value })
-              }
-            />
+      {/* ✅ HOURS */}
+      <div className="mb-3">
+        <label className="block text-sm mb-1">Hours</label>
+        <input
+          type="number"
+          value={editingEntry.hours}
+          onChange={(e) =>
+            setEditingEntry({ ...editingEntry, hours: e.target.value })
+          }
+          className="w-full border rounded-lg p-2"
+        />
+      </div>
 
-            <textarea
-              value={editingEntry.notes}
-              onChange={(e) =>
-                setEditingEntry({ ...editingEntry, notes: e.target.value })
-              }
-            />
+      {/* ✅ NOTES */}
+      <div className="mb-4">
+        <label className="block text-sm mb-1">Notes</label>
+        <textarea
+          value={editingEntry.notes}
+          onChange={(e) =>
+            setEditingEntry({ ...editingEntry, notes: e.target.value })
+          }
+          className="w-full border rounded-lg p-2"
+        />
+      </div>
 
-            <button onClick={handleUpdate}>Save</button>
-            <button onClick={() => setEditingEntry(null)}>Cancel</button>
+      {/* ✅ BUTTONS */}
+      <div className="flex justify-end gap-3">
+        <button
+          onClick={() => setEditingEntry(null)}
+          className="px-4 py-2 bg-gray-300 rounded-lg"
+        >
+          Cancel
+        </button>
 
-          </div>
-        </div>
-      )}
+        <button
+          onClick={handleUpdate}
+          className="px-4 py-2 bg-[#71a3c1] text-white rounded-lg"
+        >
+          Save
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
+
 
     </div>
   )
