@@ -12,43 +12,69 @@ export default function AdminPage() {
   const router = useRouter()
 
   const handleSort = (column: string) => {
-  if (sortColumn === column) {
-    setSortDirection(sortDirection === "asc" ? "desc" : "asc")
-  } else {
-    setSortColumn(column)
-    setSortDirection("asc")
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc")
+    } else {
+      setSortColumn(column)
+      setSortDirection("asc")
+    }
   }
-}
 
   const sortEntries = (data: any[]) => {
-  if (!sortColumn) return data
+    if (!sortColumn) return data
 
-  return [...data].sort((a, b) => {
-    let valA = a[sortColumn]
-    let valB = b[sortColumn]
+    return [...data].sort((a, b) => {
+      let valA = Number(a[sortColumn])
+      let valB = Number(b[sortColumn])
 
-    if (sortColumn === "hours") {
-      valA = Number(valA)
-      valB = Number(valB)
-    }
-
-    if (valA < valB) return sortDirection === "asc" ? -1 : 1
-    if (valA > valB) return sortDirection === "asc" ? 1 : -1
-    return 0
-  })
-}
+      if (valA < valB) return sortDirection === "asc" ? -1 : 1
+      if (valA > valB) return sortDirection === "asc" ? 1 : -1
+      return 0
+    })
+  }
 
   const [entries, setEntries] = useState<any[]>([])
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
-  // ✅ FILTER STATES (ADDED)
   const [selectedMonth, setSelectedMonth] = useState(
     new Date().toISOString().slice(0, 7)
   )
   const [selectedType, setSelectedType] = useState("All")
 
-  // ✅ Auth + Admin check
+  // ✅ SUMMARY FUNCTION
+  const summarizeEntries = (data: any[]) => {
+    const result: any = {}
+
+    data.forEach((entry) => {
+      const name = entry.name
+
+      if (!result[name]) {
+        result[name] = {
+          name,
+          weekday: 0,
+          night: 0,
+          weekend: 0,
+          holiday: 0,
+        }
+      }
+
+      const hours = Number(entry.hours) || 0
+
+      if (entry.type === "Night Shift") {
+        result[name].night += hours
+      } else if (entry.type.includes("Weekend")) {
+        result[name].weekend += hours
+      } else if (entry.type.includes("Holiday")) {
+        result[name].holiday += hours
+      } else {
+        result[name].weekday += hours
+      }
+    })
+
+    return Object.values(result)
+  }
+
   useEffect(() => {
     const checkUser = async () => {
       const { data } = await supabase.auth.getUser()
@@ -70,46 +96,28 @@ export default function AdminPage() {
     }
 
     checkUser()
-  }, [selectedMonth, selectedType]) // ✅ IMPORTANT
+  }, [selectedMonth, selectedType])
 
   useEffect(() => {
-  setEntries((prev) => sortEntries(prev))
-}, [sortColumn, sortDirection])
+    setEntries((prev) => sortEntries(prev))
+  }, [sortColumn, sortDirection])
 
-  // ✅ Fetch entries WITH FILTERS
   const fetchEntries = async () => {
+    let query = supabase.from("time_entries").select("*")
 
-    const startDate = `${selectedMonth}-01`
+    if (selectedMonth) {
+      const startDate = `${selectedMonth}-01`
 
-    const lastDay = new Date(
-      new Date(selectedMonth + "-01").getFullYear(),
-      new Date(selectedMonth + "-01").getMonth() + 1,
-      0
-    ).getDate()
+      const lastDay = new Date(
+        new Date(selectedMonth + "-01").getFullYear(),
+        new Date(selectedMonth + "-01").getMonth() + 1,
+        0
+      ).getDate()
 
-    const endDate = `${selectedMonth}-${lastDay}`
+      const endDate = `${selectedMonth}-${lastDay}`
 
-let query = supabase
-  .from("time_entries")
-  .select("*")
-
-// ✅ ONLY apply date filter if month is selected
-if (selectedMonth) {
-  const startDate = `${selectedMonth}-01`
-
-  const lastDay = new Date(
-    new Date(selectedMonth + "-01").getFullYear(),
-    new Date(selectedMonth + "-01").getMonth() + 1,
-    0
-  ).getDate()
-
-  const endDate = `${selectedMonth}-${lastDay}`
-
-  query = query
-    .gte("date", startDate)
-    .lte("date", endDate)
-}
-
+      query = query.gte("date", startDate).lte("date", endDate)
+    }
 
     if (selectedType !== "All") {
       query = query.eq("type", selectedType)
@@ -117,14 +125,21 @@ if (selectedMonth) {
 
     const { data } = await query.order("date", { ascending: false })
 
-    setEntries(sortEntries(data || []))
+    const summarized = summarizeEntries(data || [])
+
+    setEntries(sortEntries(summarized))
     setLoading(false)
   }
 
-  // ✅ Loading guard
   if (loading) {
     return <div className="min-h-screen bg-[#c6dbdc]" />
   }
+
+  // ✅ TOTAL CALCULATIONS
+  const totalWeekday = entries.reduce((sum, e) => sum + e.weekday, 0)
+  const totalNight = entries.reduce((sum, e) => sum + e.night, 0)
+  const totalWeekend = entries.reduce((sum, e) => sum + e.weekend, 0)
+  const totalHoliday = entries.reduce((sum, e) => sum + e.holiday, 0)
 
   return (
     <div className="min-h-screen bg-[#c6dbdc] text-black">
@@ -141,7 +156,7 @@ if (selectedMonth) {
             Logged in as: {user?.email}
           </p>
 
-          {/* ✅ FILTERS (ADDED BACK) */}
+          {/* FILTERS */}
           <div className="mb-4 grid grid-cols-2 gap-3">
 
             <div>
@@ -175,17 +190,18 @@ if (selectedMonth) {
 
           </div>
 
-          {/* ✅ REAL EXCEL EXPORT (FIXED) */}
+          {/* ✅ EXPORT SUMMARY */}
           <div className="mb-4 flex justify-end">
             <button
               onClick={() => {
-
                 const rows = entries.map(e => `
                   <Row>
-                    <Cell><Data ss:Type="String">${e.date}</Data></Cell>
+                    <Cell><Data ss:Type="String">${selectedMonth || "All"}</Data></Cell>
                     <Cell><Data ss:Type="String">${e.name}</Data></Cell>
-                    <Cell><Data ss:Type="String">${e.type}</Data></Cell>
-                    <Cell><Data ss:Type="Number">${e.hours}</Data></Cell>
+                    <Cell><Data ss:Type="Number">${e.weekday}</Data></Cell>
+                    <Cell><Data ss:Type="Number">${e.night}</Data></Cell>
+                    <Cell><Data ss:Type="Number">${e.weekend}</Data></Cell>
+                    <Cell><Data ss:Type="Number">${e.holiday}</Data></Cell>
                   </Row>
                 `).join("")
 
@@ -197,10 +213,12 @@ if (selectedMonth) {
                       <Table>
 
                         <Row>
-                          <Cell><Data ss:Type="String">Date</Data></Cell>
+                          <Cell><Data ss:Type="String">Month</Data></Cell>
                           <Cell><Data ss:Type="String">Name</Data></Cell>
-                          <Cell><Data ss:Type="String">Type</Data></Cell>
-                          <Cell><Data ss:Type="String">Hours</Data></Cell>
+                          <Cell><Data ss:Type="String">Weekday OT</Data></Cell>
+                          <Cell><Data ss:Type="String">Night OT</Data></Cell>
+                          <Cell><Data ss:Type="String">Weekend OT</Data></Cell>
+                          <Cell><Data ss:Type="String">Holiday OT</Data></Cell>
                         </Row>
 
                         ${rows}
@@ -229,36 +247,52 @@ if (selectedMonth) {
             </button>
           </div>
 
-          {/* ✅ Table */}
+          {/* ✅ TABLE */}
           <table className="w-full text-sm border">
             <thead className="bg-gray-200">
               <tr>
-    <th className="p-2 cursor-pointer" onClick={() => handleSort("date")}>
-      Date ⬍
-    </th>
-    <th className="p-2 cursor-pointer" onClick={() => handleSort("date")}>
-      Name ⬍
-    </th>
-
-    <th className="p-2 cursor-pointer" onClick={() => handleSort("date")}>
-      Type ⬍
-    </th>
-    <th className="p-2 cursor-pointer" onClick={() => handleSort("date")}>
-      Hours ⬍
-    </th>
+                <th className="p-2">Month</th>
+                <th className="p-2">Name</th>
+                <th className="p-2 cursor-pointer" onClick={() => handleSort("weekday")}>
+                  Weekday OT ⬍
+                </th>
+                <th className="p-2 cursor-pointer" onClick={() => handleSort("night")}>
+                  Night OT ⬍
+                </th>
+                <th className="p-2 cursor-pointer" onClick={() => handleSort("weekend")}>
+                  Weekend OT ⬍
+                </th>
+                <th className="p-2 cursor-pointer" onClick={() => handleSort("holiday")}>
+                  Holiday OT ⬍
+                </th>
               </tr>
             </thead>
 
             <tbody>
-              {entries.map((entry) => (
-                <tr key={entry.id} className="border-t">
-                  <td className="p-2">{entry.date}</td>
+              {entries.map((entry, index) => (
+                <tr key={index} className="border-t">
+                  <td className="p-2">{selectedMonth || "All"}</td>
                   <td className="p-2">{entry.name}</td>
-                  <td className="p-2">{entry.type}</td>
-                  <td className="p-2">{entry.hours}</td>
+                  <td className="p-2">{entry.weekday}</td>
+                  <td className="p-2">{entry.night}</td>
+                  <td className="p-2">{entry.weekend}</td>
+                  <td className="p-2">{entry.holiday}</td>
                 </tr>
               ))}
             </tbody>
+
+            {/* ✅ TOTAL ROW */}
+            <tfoot>
+              <tr className="font-semibold bg-gray-100 border-t">
+                <td></td>
+                <td>TOTAL</td>
+                <td>{totalWeekday}</td>
+                <td>{totalNight}</td>
+                <td>{totalWeekend}</td>
+                <td>{totalHoliday}</td>
+              </tr>
+            </tfoot>
+
           </table>
 
         </div>
