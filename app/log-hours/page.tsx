@@ -4,266 +4,191 @@ import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabaseClient"
 import Navbar from "@/components/Navbar"
 
-const primaryButton =
-  "bg-[#71a3c1] text-white px-4 py-2 rounded-lg hover:opacity-90"
-
-const hourTypes = [
-  {
-    name: "Pre-Shift",
-    description: "Time rendered before the scheduled shift"
-  },
-  {
-    name: "Post-Shift",
-    description: "Time rendered after the shift that cannot be handed over"
-  },
-  {
-    name: "Weekday HC",
-    description: "Health check on weekdays when not on shift"
-  },
-  {
-    name: "Night Shift",
-    description: "Shift between 10PM – 6AM"
-  },
-  {
-    name: "Weekend HC",
-    description: "Health check on weekends when not on shift"
-  },
-  {
-    name: "Weekend Release",
-    description: "Release activities (2nd week of month)"
-  },
-  {
-    name: "Weekend Patching",
-    description: "Patching activities (3rd week of month)"
-  },
-  {
-    name: "Weekend Shift",
-    description: "Work beyond 5 working days"
-  },
-  {
-    name: "Holiday Shift",
-    description: "Shift during public holiday"
-  }
-]
-
 export default function AddEntryPage() {
-  const [loading, setLoading] = useState(true)
+
+  // ✅ Allowed users (email → display name)
   const allowedUsers: Record<string, string> = {
-  "socciano@pingala.eu": "Sarah Ammon Occiano",
-  "rjavier@pingala.eu": "Romilyn Joy Javier",
-  "dvillanueva@pingala.eu": "Diane Villanueva",
-  "kquilay@pingala.eu": "Kinverly Rhazmen Quilay",
-  "ksaquing@pingala.eu": "Krizza Fatima Saquing",
-  "nabesamis@pingala.eu": "Niel Joseph Abesamis",
-  "ffaruqui@pingala.eu": "Faraz Faruqui",
-  "jcruz@pingala.eu": "Joyce Monica Cruz",
-  "athomas@pingala.eu": "Anu Thomas",
-  "hgadepalli@pingala.eu": "Harshil Gadepalli",
-  "skrishnan@pingala.eu": "Sagar Krishnan",
-  "rgogineni@pingala.eu": "Rahul Gogineni",
-  "polarte@pingala.eu": "Patricia Olarte",
-  "cmartinez@pingala.eu": "Cleive Martinez",
-  "rlata@pingala.eu": "Rosemarie Elaine Lata",
-  "rvelasco@pingala.eu": "Richard Mon Velasco",
-  "nvillareal@pingala.eu": "Noriel Villareal",
-  "rebeccajoydvillareal@gmail.com": "Rebecca Joy Villareal",
-}
+    "socciano@pingala.eu": "Sarah Ammon Occiano",
+    "rjavier@pingala.eu": "Romilyn Joy Javier",
+    "dvillanueva@pingala.eu": "Diane Villanueva",
+    "kquilay@pingala.eu": "Kinverly Rhazmen Quilay",
+    "ksaquing@pingala.eu": "Krizza Fatima Saquing",
+    "nabesamis@pingala.eu": "Niel Joseph Abesamis",
+    "ffaruqui@pingala.eu": "Faraz Faruqui",
+    "jcruz@pingala.eu": "Joyce Monica Cruz",
+    "athomas@pingala.eu": "Anu Thomas",
+    "hgadepalli@pingala.eu": "Harshil Gadepalli",
+    "skrishnan@pingala.eu": "Sagar Krishnan",
+    "rgogineni@pingala.eu": "Rahul Gogineni",
+    "polarte@pingala.eu": "Patricia Olarte",
+    "cmartinez@pingala.eu": "Cleive Martinez",
+    "rlata@pingala.eu": "Rosemarie Elaine Lata",
+    "rvelasco@pingala.eu": "Richard Mon Velasco",
+    "nvillareal@pingala.eu": "Noriel Villareal",
+  }
+
+  // ✅ States
   const [date, setDate] = useState("")
   const [hours, setHours] = useState("")
   const [type, setType] = useState("")
   const [notes, setNotes] = useState("")
   const [message, setMessage] = useState("")
   const [user, setUser] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
 
-useEffect(() => {
-  const getUser = async () => {
-    const { data } = await supabase.auth.getUser()
-    const email = data.user?.email
+  // ✅ Auth + Access Control
+  useEffect(() => {
+    const getUser = async () => {
+      const { data } = await supabase.auth.getUser()
+      const email = data.user?.email
 
-    if (!email) {
-      window.location.href = "/login"
+      if (!email) {
+        window.location.href = "/login"
+        return
+      }
+
+      if (!allowedUsers[email]) {
+        alert("❌ You are not authorized to access this app")
+        window.location.href = "/login"
+        return
+      }
+
+      setUser(data.user)
+      setLoading(false)
+    }
+
+    getUser()
+  }, [])
+
+  // ✅ Submit
+  const handleSubmit = async () => {
+    setMessage("")
+
+    if (!user) {
+      setMessage("❌ Please login first.")
       return
     }
 
-    if (!allowedUsers[email]) {
-      alert("❌ You are not authorized to access this app")
-      window.location.href = "/login"
+    if (!date || !hours || !type) {
+      setMessage("Please fill all required fields.")
       return
     }
 
-    setUser(data.user)
-    setLoading(false)
+    if (Number(hours) > 24) {
+      setMessage("Hours cannot exceed 24.")
+      return
+    }
+
+    const { error } = await supabase
+      .from("time_entries")
+      .insert([
+        {
+          name: allowedUsers[user.email],
+          date: date,
+          hours: Number(hours),
+          type: type,
+          notes: notes,
+        },
+      ])
+
+    if (error) {
+      console.error(error)
+      setMessage("❌ Failed to save entry.")
+      return
+    }
+
+    setMessage("✅ Entry saved successfully.")
+
+    setDate("")
+    setHours("")
+    setType("")
+    setNotes("")
   }
 
-  getUser()
-}, [])
-
-
-
-const handleSubmit = async () => {
-  setMessage("")
-
-if (!user) {
-  setMessage("❌ Please login first.")
-  return
-}
-
-
-if (!date || !hours || !type) {
-  setMessage("Please fill all required fields.")
-  return
-}
-
-  if (Number(hours) > 24) {
-    setMessage("Hours cannot exceed 24. Find a life!")
-    return
+  // ✅ Loading guard (VERY IMPORTANT)
+  if (loading) {
+    return <div className="p-6">Loading...</div>
   }
-
-  const { data, error } = await supabase
-    .from("time_entries")
-.insert([
-  {
-    name: allowedUsers[user?.email || ""],
-    date: date,
-    hours: Number(hours),
-    type: type,
-    notes: notes
-  }
-])
-
-  if (error) {
-    console.error("Database error:", error)
-    setMessage("❌ Failed to save entry.")
-    return
-  }
-
-  setMessage("✅ Entry saved successfully.")
-
-  // reset form
-  setDate("")
-  setHours("")
-  setType("")
-  setNotes("")
-}
-
-if (loading) {
-  return <div className="p-6">Loading...</div>
-}
 
   return (
-<div className="min-h-screen bg-[#c6dbdc] text-black">
-  <Navbar />
+    <div className="min-h-screen bg-[#c6dbdc] text-black">
+      <Navbar />
 
-<div className="max-w-4xl mx-auto p-6">
-  <div className="bg-white text-black p-6 rounded-xl shadow-xl border border-gray-200">
+      <div className="max-w-4xl mx-auto p-6">
+        <div className="bg-white p-6 rounded-xl shadow-xl border">
 
-        {/* Title */}
-        <div>
-          <h1 className="text-2xl font-semibold">Overtime Hours</h1>
-          <p className="text-sm text-gray-700">
+          <h1 className="text-2xl font-semibold mb-2">
+            Overtime Hours
+          </h1>
+
+          <p className="text-sm text-gray-700 mb-2">
             Add your work hours for a specific day
           </p>
-          <br></br>
-<p className="text-sm mb-3 text-gray-600">
-  Logged in as: {allowedUsers[user?.email || ""]}
-</p>
 
-<br></br>
-        </div>
+          {/* ✅ Logged-in user */}
+          <p className="text-sm mb-4 text-gray-600">
+            Logged in as: {allowedUsers[user.email]}
+          </p>
 
-
-
-        {/* Date */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Date</label>
+          {/* Date */}
           <input
             type="date"
-            className="w-full border border-gray-300 rounded-lg p-2 bg-white text-black"
+            className="w-full border rounded-lg p-2 mb-3"
             value={date}
             onChange={(e) => setDate(e.target.value)}
           />
-        </div>
 
-        {/* Type */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Type</label>
+          {/* Type */}
           <select
-            className="w-full border border-gray-300 rounded-lg p-2 bg-white text-black"
+            className="w-full border rounded-lg p-2 mb-3"
             value={type}
             onChange={(e) => setType(e.target.value)}
           >
             <option value="">Select type</option>
-            {hourTypes.map((t) => (
-              <option key={t.name} value={t.name}>
-                {t.name}
-              </option>
-            ))}
+            <option value="Pre-Shift">Pre-Shift</option>
+            <option value="Post-Shift">Post-Shift</option>
+            <option value="Night Shift">Night Shift</option>
+            <option value="Weekend HC">Weekend HC</option>
+            <option value="Weekend Shift">Weekend Shift</option>
+            <option value="Weekend Release">Weekend Release</option>
+            <option value="Weekend Patching">Weekend Patching</option>
+            <option value="Holiday Shift">Holiday Shift</option>
           </select>
 
-          {/* Description */}
-          {type && (
-            <p className="text-xs text-gray-500 mt-1">
-              {
-                hourTypes.find((t) => t.name === type)
-                  ?.description
-              }
-            </p>
-          )}
-        </div>
-
-        {/* Hours */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Hours</label>
+          {/* Hours */}
           <input
             type="number"
-            placeholder="e.g. 2, 4, 8"
-            className="w-full border border-gray-300 rounded-lg p-2 bg-white text-black"
+            placeholder="Hours"
+            className="w-full border rounded-lg p-2 mb-3"
             value={hours}
             onChange={(e) => setHours(e.target.value)}
           />
-        </div>
 
-        {/* Notes */}
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Notes (optional)
-          </label>
+          {/* Notes */}
           <textarea
-            className="w-full border border-gray-300 rounded-lg p-2 bg-white text-black"
-            rows={3}
+            className="w-full border rounded-lg p-2 mb-3"
+            placeholder="Notes"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
           />
-        </div>
 
-        {/* Button */}
-        <div className="flex gap-3">
+          {/* Buttons */}
           <button
             onClick={handleSubmit}
-            className="flex-1 bg-[#71a3c1] text-white rounded-lg py-2 hover:opacity-90"
+            className="w-full bg-[#71a3c1] text-white py-2 rounded-lg"
           >
             Add Entry
           </button>
 
-          <button
-            onClick={handleSubmit}
-            className="flex-1 bg-[#71a3c1] text-white rounded-lg py-2 hover:opacity-90"
-          >
-            Add & New
-          </button>
-        </div>
+          {/* Message */}
+          {message && (
+            <p className="text-sm mt-3 text-center">
+              {message}
+            </p>
+          )}
 
-        {/* Message */}
-        {message && (
-          <div className="text-sm text-center text-gray-600">
-            {message}
-          </div>
-        )}
-        
+        </div>
       </div>
     </div>
-    </div>
   )
-
 }
-   

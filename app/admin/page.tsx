@@ -4,6 +4,9 @@ import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabaseClient"
 import Navbar from "@/components/Navbar"
 import * as XLSX from "xlsx"
+const ADMIN_EMAIL = "nvillareal@pingala.eu"
+const [user, setUser] = useState<any>(null)
+const [loading, setLoading] = useState(true)
 
 export default function AdminPage() {
   const [entries, setEntries] = useState<any[]>([])
@@ -17,6 +20,11 @@ const fetchEntries = async () => {
   let query = supabase
     .from("time_entries")
     .select("*")
+    
+if (loading) {
+  return <div className="p-6">Loading...</div>
+}
+
 
   // ✅ Only apply date filter IF user selects month
   if (selectedMonth) {
@@ -167,12 +175,28 @@ const exportBreakdownToExcel = () => {
 
 
 
+useEffect(() => {
+  const checkUser = async () => {
+    const { data } = await supabase.auth.getUser()
+    const email = data.user?.email
 
+    if (!email) {
+      window.location.href = "/login"
+      return
+    }
 
+    if (email !== ADMIN_EMAIL) {
+      alert("❌ Admin access only")
+      window.location.href = "/log-hours"
+      return
+    }
 
-  useEffect(() => {
-    fetchEntries()
-  }, [selectedMonth, selectedType])
+    setUser(data.user)
+    setLoading(false)
+  }
+
+  checkUser()
+}, [])
 
   return (
     <div className="min-h-screen bg-[#c6dbdc] text-black">
