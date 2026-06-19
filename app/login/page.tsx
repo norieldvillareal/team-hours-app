@@ -47,7 +47,7 @@ export default function LoginPage() {
         />
 
         <h1 className="text-2xl font-semibold mb-2 text-gray-800">
-          Team Hours
+          Overtime Hours
         </h1>
 
         <p className="text-sm text-gray-600 mb-6">
