@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabaseClient"
 import Navbar from "@/components/Navbar"
+
 const primaryButton =
   "bg-[#71a3c1] text-white px-4 py-2 rounded-lg hover:opacity-90"
 
@@ -46,6 +47,7 @@ const hourTypes = [
 ]
 
 export default function AddEntryPage() {
+  const [loading, setLoading] = useState(true)
   const allowedUsers: Record<string, string> = {
   "socciano@pingala.eu": "Sarah Ammon Occiano",
   "rjavier@pingala.eu": "Romilyn Joy Javier",
@@ -66,7 +68,6 @@ export default function AddEntryPage() {
   "nvillareal@pingala.eu": "Noriel Villareal",
   "rebeccajoydvillareal@gmail.com": "Rebecca Joy Villareal",
 }
-  const [name, setName] = useState("")
   const [date, setDate] = useState("")
   const [hours, setHours] = useState("")
   const [type, setType] = useState("")
@@ -91,10 +92,12 @@ useEffect(() => {
     }
 
     setUser(data.user)
+    setLoading(false)
   }
 
   getUser()
 }, [])
+
 
 
 const handleSubmit = async () => {
@@ -141,6 +144,10 @@ if (!date || !hours || !type) {
   setHours("")
   setType("")
   setNotes("")
+}
+
+if (loading) {
+  return <div className="p-6">Loading...</div>
 }
 
   return (
