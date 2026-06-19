@@ -1,26 +1,34 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { supabase } from "@/lib/supabaseClient"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [message, setMessage] = useState("")
 
-  const handleLogin = async () => {
-const { error } = await supabase.auth.signInWithOtp({
-  email,
-  options: {
-  emailRedirectTo:
-  process.env.NODE_ENV === "development"
-    ? "http://localhost:3000/log-hours"
-    : "https://team-hours-app.vercel.app/log-hours",
-  },
-})
+  const inputRef = useRef<HTMLInputElement>(null)
 
+  // ✅ Auto-focus email field
+  useEffect(() => {
+    inputRef.current?.focus()
+  }, [])
+
+  const handleLogin = async () => {
+    setMessage("")
+
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo:
+          process.env.NODE_ENV === "development"
+            ? "http://localhost:3000/log-hours"
+            : "https://team-hours-app.vercel.app/log-hours",
+      },
+    })
 
     if (error) {
-      setMessage("❌ Error sending email")
+      setMessage("❌ Unable to send login link")
     } else {
       setMessage("✅ Check your email for login link")
     }
@@ -28,29 +36,39 @@ const { error } = await supabase.auth.signInWithOtp({
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#c6dbdc]">
-      <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md">
 
-        <h1 className="text-xl font-semibold mb-4">
-          Login
+      <div className="bg-white p-8 rounded-xl shadow-xl w-full max-w-md text-center">
+
+        {/* ✅ LOGO */}
+        /logo.png
+
+        <h1 className="text-2xl font-semibold mb-2">
+          Team Hours
         </h1>
 
+        <p className="text-sm text-gray-600 mb-6">
+          Login using your work email
+        </p>
+
+        {/* ✅ INPUT WITH AUTOFOCUS */}
         <input
+          ref={inputRef}
           type="email"
-          placeholder="Enter your email"
-          className="border border-gray-300 rounded-lg p-2 w-full mb-3"
+          placeholder="yourname@pingala.eu"
+          className="w-full border border-gray-300 rounded-lg p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-[#40948d]"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
 
         <button
           onClick={handleLogin}
-          className="w-full bg-[#71a3c1] text-white py-2 rounded-lg"
+          className="w-full bg-[#40948d] text-white py-3 rounded-lg hover:opacity-90 transition"
         >
           Send Login Link
         </button>
 
         {message && (
-          <p className="mt-3 text-sm text-gray-600">
+          <p className="mt-4 text-sm text-gray-700">
             {message}
           </p>
         )}
