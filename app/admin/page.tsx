@@ -76,23 +76,38 @@ if (loading) {
 
 <div className="mb-4 flex justify-end">
   <button
-    onClick={() => {
-      const csv = entries
-        .map(e => `${e.date},${e.name},${e.type},${e.hours}`)
-        .join("\n")
+  onClick={() => {
+    // ✅ Header row
+    const header = "Date,Name,Type,Hours\n"
 
-      const blob = new Blob([csv], { type: "text/csv" })
-      const url = URL.createObjectURL(blob)
+    // ✅ Data rows
+    const rows = entries
+      .map(
+        (e) =>
+          `${e.date},${e.name},${e.type},${e.hours}`
+      )
+      .join("\n")
 
-      const a = document.createElement("a")
-      a.href = url
-      a.download = "ot_report.csv"
-      a.click()
-    }}
-    className="bg-[#71a3c1] text-white px-4 py-2 rounded-lg"
-  >
-    Export CSV
-  </button>
+    // ✅ Create file
+    const blob = new Blob([header + rows], {
+      type: "text/csv;charset=utf-8;",
+    })
+
+    const url = URL.createObjectURL(blob)
+
+    // ✅ Download
+    const link = document.createElement("a")
+    link.href = url
+    link.download = `OT_Report_${new Date()
+      .toISOString()
+      .slice(0, 10)}.xlsx` // 👈 looks like Excel
+    link.click()
+  }}
+  className="bg-[#71a3c1] text-white px-4 py-2 rounded-lg hover:opacity-90"
+>
+  Export Excel
+</button>
+
 </div>
 
 

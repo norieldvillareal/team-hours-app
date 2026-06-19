@@ -141,8 +141,8 @@ export default function TimesheetPage() {
 
   //if (loading) return <div className="p-6">Loading...</div>
   if (loading) {
-  return <div className="min-h-screen bg-[#c6dbdc]" />
-}
+    return <div className="min-h-screen bg-[#c6dbdc]" />
+  }
 
   return (
     <div className="min-h-screen bg-[#c6dbdc] text-black">
@@ -159,6 +159,40 @@ export default function TimesheetPage() {
             Logged in as: {allowedUsers[user.email]}
           </p>
 
+          {/* ✅ FILTERS */}
+          <div className="mb-4 grid grid-cols-2 gap-3">
+
+            <div>
+              <label className="block text-sm mb-1">Month</label>
+              <input
+                type="month"
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+                className="w-full border rounded-lg p-2"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm mb-1">Type</label>
+              <select
+                value={selectedType}
+                onChange={(e) => setSelectedType(e.target.value)}
+                className="w-full border rounded-lg p-2"
+              >
+                <option value="All">All</option>
+                <option value="Pre-Shift">Pre-Shift</option>
+                <option value="Post-Shift">Post-Shift</option>
+                <option value="Night Shift">Night Shift</option>
+                <option value="Weekend HC">Weekend HC</option>
+                <option value="Weekend Shift">Weekend Shift</option>
+                <option value="Weekend Release">Weekend Release</option>
+                <option value="Weekend Patching">Weekend Patching</option>
+                <option value="Holiday Shift">Holiday Shift</option>
+              </select>
+            </div>
+
+          </div>
+
           {/* HEADER */}
           <div className="mb-4 flex justify-between items-center">
             <div className="text-lg">
@@ -170,7 +204,7 @@ export default function TimesheetPage() {
               disabled={isSubmitted}
               className={`px-4 py-2 rounded-lg text-white ${
                 isSubmitted
-                  ? "bg-gray-400 cursor-not-allowed"
+                  ? "bg-gray-400"
                   : "bg-[#71a3c1]"
               }`}
             >
@@ -219,7 +253,6 @@ export default function TimesheetPage() {
                       </div>
                     )}
                   </td>
-
                 </tr>
               ))}
             </tbody>
@@ -232,7 +265,6 @@ export default function TimesheetPage() {
       {showConfirm && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-xl">
-
             <h2 className="mb-4">Confirm submission?</h2>
 
             <div className="flex gap-2">
