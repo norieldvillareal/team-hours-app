@@ -8,9 +8,16 @@ export default function LoginPage() {
   const [message, setMessage] = useState("")
 
   const handleLogin = async () => {
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-    })
+const { error } = await supabase.auth.signInWithOtp({
+  email,
+  options: {
+  emailRedirectTo:
+  process.env.NODE_ENV === "development"
+    ? "http://localhost:3000/log-hours"
+    : "https://team-hours-app.vercel.app/log-hours",
+  },
+})
+
 
     if (error) {
       setMessage("❌ Error sending email")
