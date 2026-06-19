@@ -28,6 +28,7 @@ export default function Navbar() {
     "rlata@pingala.eu": "Rosemarie Elaine Lata",
     "rvelasco@pingala.eu": "Richard Mon Velasco",
     "nvillareal@pingala.eu": "Noriel Villareal",
+    "norieldvillareal@gmail.com": "Noriel GMAIL",
   }
 
   useEffect(() => {
