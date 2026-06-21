@@ -43,18 +43,17 @@ export default function AdminPage() {
   )
   const [selectedType, setSelectedType] = useState("All")
 
-  // ✅ CATEGORY FUNCTION
+  // ✅ NEW NAME FILTER
+  const [selectedName, setSelectedName] = useState("All")
+
   const getCategory = (type: string) => {
     if (!type) return ""
-
     if (type === "Night Shift") return "Night OT"
     if (type.includes("Weekend")) return "Weekend OT"
     if (type.includes("Holiday")) return "Holiday OT"
-
     return "Weekday OT"
   }
 
-  // ✅ SUMMARY FUNCTION
   const summarizeEntries = (data: any[]) => {
     const result: any = {}
 
@@ -108,7 +107,7 @@ export default function AdminPage() {
     }
 
     checkUser()
-  }, [selectedMonth, selectedType])
+  }, [selectedMonth, selectedType, selectedName]) // ✅ UPDATED
 
   useEffect(() => {
     setEntries((prev) => sortEntries(prev))
@@ -119,13 +118,11 @@ export default function AdminPage() {
 
     if (selectedMonth) {
       const startDate = `${selectedMonth}-01`
-
       const lastDay = new Date(
         new Date(selectedMonth + "-01").getFullYear(),
         new Date(selectedMonth + "-01").getMonth() + 1,
         0
       ).getDate()
-
       const endDate = `${selectedMonth}-${lastDay}`
 
       query = query.gte("date", startDate).lte("date", endDate)
@@ -137,9 +134,18 @@ export default function AdminPage() {
 
     const { data } = await query.order("date", { ascending: false })
 
-    setRawEntries(data || [])
+    let filteredData = data || []
 
-    const summarized = summarizeEntries(data || [])
+    // ✅ NAME FILTER
+    if (selectedName !== "All") {
+      filteredData = filteredData.filter(
+        (entry) => entry.name === selectedName
+      )
+    }
+
+    setRawEntries(filteredData)
+
+    const summarized = summarizeEntries(filteredData)
 
     setEntries(sortEntries(summarized))
     setLoading(false)
@@ -169,9 +175,10 @@ export default function AdminPage() {
             Logged in as: {user?.email}
           </p>
 
-          {/* FILTERS */}
-          <div className="mb-4 grid grid-cols-2 gap-3">
+          {/* ✅ FILTERS */}
+          <div className="mb-4 grid grid-cols-3 gap-3">
 
+            {/* Month */}
             <div>
               <label className="block text-sm mb-1">Month</label>
               <input
@@ -182,6 +189,7 @@ export default function AdminPage() {
               />
             </div>
 
+            {/* Type */}
             <div>
               <label className="block text-sm mb-1">Type</label>
               <select
@@ -201,87 +209,23 @@ export default function AdminPage() {
               </select>
             </div>
 
-          </div>
+            {/* ✅ NAME FILTER */}
+            <div>
+              <label className="block text-sm mb-1">Name</label>
+              <select
+                value={selectedName}
+                onChange={(e) => setSelectedName(e.target.value)}
+                className="w-full border rounded-lg p-2"
+              >
+                <option value="All">All</option>
+                {[...new Set(rawEntries.map(e => e.name))].map((name) => (
+                  <option key={name} value={name}>
+                    {name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          {/* ✅ EXPORT FULL */}
-          <div className="mb-4 flex justify-end">
-            <button
-              onClick={() => {
-
-                const summaryRows = entries.map(e => `
-                  <Row>
-                    <Cell><Data ss:Type="String">${selectedMonth || "All"}</Data></Cell>
-                    <Cell><Data ss:Type="String">${e.name}</Data></Cell>
-                    <Cell><Data ss:Type="Number">${e.weekday}</Data></Cell>
-                    <Cell><Data ss:Type="Number">${e.night}</Data></Cell>
-                    <Cell><Data ss:Type="Number">${e.weekend}</Data></Cell>
-                    <Cell><Data ss:Type="Number">${e.holiday}</Data></Cell>
-                  </Row>
-                `).join("")
-
-                const rawRows = rawEntries.map(e => `
-                  <Row>
-                    <Cell><Data ss:Type="String">${e.date}</Data></Cell>
-                    <Cell><Data ss:Type="String">${e.name}</Data></Cell>
-                    <Cell><Data ss:Type="String">${e.type}</Data></Cell>
-                    <Cell><Data ss:Type="String">${getCategory(e.type)}</Data></Cell>
-                    <Cell><Data ss:Type="Number">${e.hours}</Data></Cell>
-                  </Row>
-                `).join("")
-
-                const xml = `<?xml version="1.0"?>
-                  <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
-                    xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
-                    <Worksheet ss:Name="Full Report">
-                      <Table>
-
-                        <Row><Cell><Data ss:Type="String">SUMMARY</Data></Cell></Row>
-
-                        <Row>
-                          <Cell><Data ss:Type="String">Month</Data></Cell>
-                          <Cell><Data ss:Type="String">Name</Data></Cell>
-                          <Cell><Data ss:Type="String">Weekday OT</Data></Cell>
-                          <Cell><Data ss:Type="String">Night OT</Data></Cell>
-                          <Cell><Data ss:Type="String">Weekend OT</Data></Cell>
-                          <Cell><Data ss:Type="String">Holiday OT</Data></Cell>
-                        </Row>
-
-                        ${summaryRows}
-
-                        <Row></Row>
-                        <Row></Row>
-
-                        <Row><Cell><Data ss:Type="String">RAW DATA</Data></Cell></Row>
-
-                        <Row>
-                          <Cell><Data ss:Type="String">Date</Data></Cell>
-                          <Cell><Data ss:Type="String">Name</Data></Cell>
-                          <Cell><Data ss:Type="String">Type</Data></Cell>
-                          <Cell><Data ss:Type="String">Category</Data></Cell>
-                          <Cell><Data ss:Type="String">Hours</Data></Cell>
-                        </Row>
-
-                        ${rawRows}
-
-                      </Table>
-                    </Worksheet>
-                  </Workbook>`
-
-                const blob = new Blob([xml], {
-                  type: "application/vnd.ms-excel",
-                })
-
-                const url = URL.createObjectURL(blob)
-
-                const link = document.createElement("a")
-                link.href = url
-                link.download = `OT_Full_${new Date().toISOString().slice(0, 10)}.xls`
-                link.click()
-              }}
-              className="bg-gray-600 text-white px-4 py-2 rounded-lg"
-            >
-              Export Full
-            </button>
           </div>
 
           {/* ✅ TABLE */}
