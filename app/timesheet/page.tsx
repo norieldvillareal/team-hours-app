@@ -220,7 +220,7 @@ if (selectedMonth) {
         <div className="bg-white p-6 rounded-xl shadow-xl border">
 
           <h1 className="text-2xl font-semibold mb-4">
-            My Overtime Hours
+            My Overtime
           </h1>
 
           <p className="text-sm mb-4 text-gray-600">
