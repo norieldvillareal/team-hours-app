@@ -34,6 +34,7 @@ export default function AdminPage() {
   }
 
   const [entries, setEntries] = useState<any[]>([])
+  const [rawEntries, setRawEntries] = useState<any[]>([]) // ✅ NEW
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
@@ -125,6 +126,8 @@ export default function AdminPage() {
 
     const { data } = await query.order("date", { ascending: false })
 
+    setRawEntries(data || []) // ✅ STORE RAW
+
     const summarized = summarizeEntries(data || [])
 
     setEntries(sortEntries(summarized))
@@ -190,8 +193,10 @@ export default function AdminPage() {
 
           </div>
 
-          {/* ✅ EXPORT SUMMARY */}
-          <div className="mb-4 flex justify-end">
+          {/* ✅ EXPORT BUTTONS */}
+          <div className="mb-4 flex justify-end gap-2">
+
+            {/* ✅ SUMMARY EXPORT */}
             <button
               onClick={() => {
                 const rows = entries.map(e => `
@@ -205,11 +210,10 @@ export default function AdminPage() {
                   </Row>
                 `).join("")
 
-                const xml = `
-                  <?xml version="1.0"?>
+                const xml = `<?xml version="1.0"?>
                   <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
                     xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
-                    <Worksheet ss:Name="OT Report">
+                    <Worksheet ss:Name="Summary">
                       <Table>
 
                         <Row>
@@ -225,46 +229,106 @@ export default function AdminPage() {
 
                       </Table>
                     </Worksheet>
-                  </Workbook>
-                `
+                  </Workbook>`
 
-                const blob = new Blob([xml], {
-                  type: "application/vnd.ms-excel",
-                })
-
+                const blob = new Blob([xml], { type: "application/vnd.ms-excel" })
                 const url = URL.createObjectURL(blob)
 
                 const link = document.createElement("a")
                 link.href = url
-                link.download = `OT_Report_${new Date()
-                  .toISOString()
-                  .slice(0, 10)}.xls`
+                link.download = `OT_Summary_${new Date().toISOString().slice(0, 10)}.xls`
                 link.click()
               }}
-              className="bg-[#71a3c1] text-white px-4 py-2 rounded-lg hover:opacity-90"
+              className="bg-[#71a3c1] text-white px-4 py-2 rounded-lg"
             >
-              Export Excel
+              Export Summary
             </button>
+
+            {/* ✅ FULL EXPORT (SUMMARY + RAW) */}
+            <button
+              onClick={() => {
+                const summaryRows = entries.map(e => `
+                  <Row>
+                    <Cell><Data ss:Type="String">${selectedMonth || "All"}</Data></Cell>
+                    <Cell><Data ss:Type="String">${e.name}</Data></Cell>
+                    <Cell><Data ss:Type="Number">${e.weekday}</Data></Cell>
+                    <Cell><Data ss:Type="Number">${e.night}</Data></Cell>
+                    <Cell><Data ss:Type="Number">${e.weekend}</Data></Cell>
+                    <Cell><Data ss:Type="Number">${e.holiday}</Data></Cell>
+                  </Row>
+                `).join("")
+
+                const rawRows = rawEntries.map(e => `
+                  <Row>
+                    <Cell><Data ss:Type="String">${e.date}</Data></Cell>
+                    <Cell><Data ss:Type="String">${e.name}</Data></Cell>
+                    <Cell><Data ss:Type="String">${e.type}</Data></Cell>
+                    <Cell><Data ss:Type="Number">${e.hours}</Data></Cell>
+                  </Row>
+                `).join("")
+
+                const xml = `<?xml version="1.0"?>
+                  <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+                    xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+                    <Worksheet ss:Name="Full Report">
+                      <Table>
+
+                        <Row><Cell><Data ss:Type="String">SUMMARY</Data></Cell></Row>
+
+                        <Row>
+                          <Cell><Data ss:Type="String">Month</Data></Cell>
+                          <Cell><Data ss:Type="String">Name</Data></Cell>
+                          <Cell><Data ss:Type="String">Weekday OT</Data></Cell>
+                          <Cell><Data ss:Type="String">Night OT</Data></Cell>
+                          <Cell><Data ss:Type="String">Weekend OT</Data></Cell>
+                          <Cell><Data ss:Type="String">Holiday OT</Data></Cell>
+                        </Row>
+
+                        ${summaryRows}
+
+                        <Row></Row>
+                        <Row></Row>
+
+                        <Row><Cell><Data ss:Type="String">RAW DATA</Data></Cell></Row>
+
+                        <Row>
+                          <Cell><Data ss:Type="String">Date</Data></Cell>
+                          <Cell><Data ss:Type="String">Name</Data></Cell>
+                          <Cell><Data ss:Type="String">Type</Data></Cell>
+                          <Cell><Data ss:Type="String">Hours</Data></Cell>
+                        </Row>
+
+                        ${rawRows}
+
+                      </Table>
+                    </Worksheet>
+                  </Workbook>`
+
+                const blob = new Blob([xml], { type: "application/vnd.ms-excel" })
+                const url = URL.createObjectURL(blob)
+
+                const link = document.createElement("a")
+                link.href = url
+                link.download = `OT_Full_${new Date().toISOString().slice(0, 10)}.xls`
+                link.click()
+              }}
+              className="bg-gray-600 text-white px-4 py-2 rounded-lg"
+            >
+              Export Full
+            </button>
+
           </div>
 
-          {/* ✅ TABLE */}
+          {/* ✅ TABLE (UNCHANGED) */}
           <table className="w-full text-sm border">
             <thead className="bg-gray-200">
               <tr>
                 <th className="p-2">Month</th>
                 <th className="p-2">Name</th>
-                <th className="p-2 cursor-pointer" onClick={() => handleSort("weekday")}>
-                  Weekday OT ⬍
-                </th>
-                <th className="p-2 cursor-pointer" onClick={() => handleSort("night")}>
-                  Night OT ⬍
-                </th>
-                <th className="p-2 cursor-pointer" onClick={() => handleSort("weekend")}>
-                  Weekend OT ⬍
-                </th>
-                <th className="p-2 cursor-pointer" onClick={() => handleSort("holiday")}>
-                  Holiday OT ⬍
-                </th>
+                <th className="p-2 cursor-pointer" onClick={() => handleSort("weekday")}>Weekday OT ⬍</th>
+                <th className="p-2 cursor-pointer" onClick={() => handleSort("night")}>Night OT ⬍</th>
+                <th className="p-2 cursor-pointer" onClick={() => handleSort("weekend")}>Weekend OT ⬍</th>
+                <th className="p-2 cursor-pointer" onClick={() => handleSort("holiday")}>Holiday OT ⬍</th>
               </tr>
             </thead>
 
@@ -281,7 +345,6 @@ export default function AdminPage() {
               ))}
             </tbody>
 
-            {/* ✅ TOTAL ROW */}
             <tfoot>
               <tr className="font-semibold bg-gray-100 border-t">
                 <td></td>
