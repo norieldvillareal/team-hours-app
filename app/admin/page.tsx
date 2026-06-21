@@ -282,6 +282,51 @@ export default function AdminPage() {
               Export Full
             </button>
           </div>
+{/* ✅ TABLE */}
+<table className="w-full text-sm border">
+  <thead className="bg-gray-200">
+    <tr>
+      <th className="p-2">Month</th>
+      <th className="p-2">Name</th>
+      <th className="p-2 cursor-pointer" onClick={() => handleSort("weekday")}>
+        Weekday OT ⬍
+      </th>
+      <th className="p-2 cursor-pointer" onClick={() => handleSort("night")}>
+        Night OT ⬍
+      </th>
+      <th className="p-2 cursor-pointer" onClick={() => handleSort("weekend")}>
+        Weekend OT ⬍
+      </th>
+      <th className="p-2 cursor-pointer" onClick={() => handleSort("holiday")}>
+        Holiday OT ⬍
+      </th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {entries.map((entry, index) => (
+      <tr key={index} className="border-t">
+        <td className="p-2">{selectedMonth || "All"}</td>
+        <td className="p-2">{entry.name}</td>
+        <td className="p-2">{entry.weekday}</td>
+        <td className="p-2">{entry.night}</td>
+        <td className="p-2">{entry.weekend}</td>
+        <td className="p-2">{entry.holiday}</td>
+      </tr>
+    ))}
+  </tbody>
+
+  <tfoot>
+    <tr className="font-semibold bg-gray-100 border-t">
+      <td></td>
+      <td>TOTAL</td>
+      <td>{totalWeekday}</td>
+      <td>{totalNight}</td>
+      <td>{totalWeekend}</td>
+      <td>{totalHoliday}</td>
+    </tr>
+  </tfoot>
+</table>
 
         </div>
       </div>
