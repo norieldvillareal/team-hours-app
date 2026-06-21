@@ -228,6 +228,88 @@ export default function AdminPage() {
 
           </div>
 
+{/* ✅ EXPORT FULL */}
+<div className="mb-4 flex justify-end">
+  <button
+    onClick={() => {
+
+      const summaryRows = entries.map(e => `
+        <Row>
+          <Cell><Data ss:Type="String">${selectedMonth || "All"}</Data></Cell>
+          <Cell><Data ss:Type="String">${e.name}</Data></Cell>
+          <Cell><Data ss:Type="Number">${e.weekday}</Data></Cell>
+          <Cell><Data ss:Type="Number">${e.night}</Data></Cell>
+          <Cell><Data ss:Type="Number">${e.weekend}</Data></Cell>
+          <Cell><Data ss:Type="Number">${e.holiday}</Data></Cell>
+        </Row>
+      `).join("")
+
+      const rawRows = rawEntries.map(e => `
+        <Row>
+          <Cell><Data ss:Type="String">${e.date}</Data></Cell>
+          <Cell><Data ss:Type="String">${e.name}</Data></Cell>
+          <Cell><Data ss:Type="String">${e.type}</Data></Cell>
+          <Cell><Data ss:Type="String">${getCategory(e.type)}</Data></Cell>
+          <Cell><Data ss:Type="Number">${e.hours}</Data></Cell>
+        </Row>
+      `).join("")
+
+      const xml = `<?xml version="1.0"?>
+        <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+          xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+          <Worksheet ss:Name="Full Report">
+            <Table>
+
+              <Row><Cell><Data ss:Type="String">SUMMARY</Data></Cell></Row>
+
+              <Row>
+                <Cell><Data ss:Type="String">Month</Data></Cell>
+                <Cell><Data ss:Type="String">Name</Data></Cell>
+                <Cell><Data ss:Type="String">Weekday OT</Data></Cell>
+                <Cell><Data ss:Type="String">Night OT</Data></Cell>
+                <Cell><Data ss:Type="String">Weekend OT</Data></Cell>
+                <Cell><Data ss:Type="String">Holiday OT</Data></Cell>
+              </Row>
+
+              ${summaryRows}
+
+              <Row></Row>
+              <Row></Row>
+
+              <Row><Cell><Data ss:Type="String">RAW DATA</Data></Cell></Row>
+
+              <Row>
+                <Cell><Data ss:Type="String">Date</Data></Cell>
+                <Cell><Data ss:Type="String">Name</Data></Cell>
+                <Cell><Data ss:Type="String">Type</Data></Cell>
+                <Cell><Data ss:Type="String">Category</Data></Cell>
+                <Cell><Data ss:Type="String">Hours</Data></Cell>
+              </Row>
+
+              ${rawRows}
+
+            </Table>
+          </Worksheet>
+        </Workbook>`
+
+      const blob = new Blob([xml], {
+        type: "application/vnd.ms-excel",
+      })
+
+      const url = URL.createObjectURL(blob)
+
+      const link = document.createElement("a")
+      link.href = url
+      link.download = `OT_Full_${new Date().toISOString().slice(0, 10)}.xls`
+      link.click()
+    }}
+    className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:opacity-90"
+  >
+    Export Full
+  </button>
+</div>
+
+
           {/* ✅ TABLE */}
           <table className="w-full text-sm border">
             <thead className="bg-gray-200">
