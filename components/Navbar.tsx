@@ -90,7 +90,7 @@ export default function Navbar() {
         </Link>
 
         <Link href="/timesheet" className={linkClass("/timesheet")}>
-          My Overtime Hours
+          My Overtime
         </Link>
 
         <Link href="/admin" className={linkClass("/admin")}>
