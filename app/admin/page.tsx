@@ -34,7 +34,7 @@ export default function AdminPage() {
   }
 
   const [entries, setEntries] = useState<any[]>([])
-  const [rawEntries, setRawEntries] = useState<any[]>([]) // ✅ NEW
+  const [rawEntries, setRawEntries] = useState<any[]>([])
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
@@ -42,6 +42,17 @@ export default function AdminPage() {
     new Date().toISOString().slice(0, 7)
   )
   const [selectedType, setSelectedType] = useState("All")
+
+  // ✅ CATEGORY FUNCTION (NEW)
+  const getCategory = (type: string) => {
+    if (!type) return ""
+
+    if (type === "Night Shift") return "Night OT"
+    if (type.includes("Weekend")) return "Weekend OT"
+    if (type.includes("Holiday")) return "Holiday OT"
+
+    return "Weekday OT"
+  }
 
   // ✅ SUMMARY FUNCTION
   const summarizeEntries = (data: any[]) => {
@@ -126,7 +137,7 @@ export default function AdminPage() {
 
     const { data } = await query.order("date", { ascending: false })
 
-    setRawEntries(data || []) // ✅ STORE RAW
+    setRawEntries(data || [])
 
     const summarized = summarizeEntries(data || [])
 
@@ -138,7 +149,6 @@ export default function AdminPage() {
     return <div className="min-h-screen bg-[#c6dbdc]" />
   }
 
-  // ✅ TOTAL CALCULATIONS
   const totalWeekday = entries.reduce((sum, e) => sum + e.weekday, 0)
   const totalNight = entries.reduce((sum, e) => sum + e.night, 0)
   const totalWeekend = entries.reduce((sum, e) => sum + e.weekend, 0)
@@ -193,58 +203,8 @@ export default function AdminPage() {
 
           </div>
 
-          {/* ✅ EXPORT BUTTONS */}
-          <div className="mb-4 flex justify-end gap-2">
-
-            {/* ✅ SUMMARY EXPORT */}
-            <button
-              onClick={() => {
-                const rows = entries.map(e => `
-                  <Row>
-                    <Cell><Data ss:Type="String">${selectedMonth || "All"}</Data></Cell>
-                    <Cell><Data ss:Type="String">${e.name}</Data></Cell>
-                    <Cell><Data ss:Type="Number">${e.weekday}</Data></Cell>
-                    <Cell><Data ss:Type="Number">${e.night}</Data></Cell>
-                    <Cell><Data ss:Type="Number">${e.weekend}</Data></Cell>
-                    <Cell><Data ss:Type="Number">${e.holiday}</Data></Cell>
-                  </Row>
-                `).join("")
-
-                const xml = `<?xml version="1.0"?>
-                  <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
-                    xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
-                    <Worksheet ss:Name="Summary">
-                      <Table>
-
-                        <Row>
-                          <Cell><Data ss:Type="String">Month</Data></Cell>
-                          <Cell><Data ss:Type="String">Name</Data></Cell>
-                          <Cell><Data ss:Type="String">Weekday OT</Data></Cell>
-                          <Cell><Data ss:Type="String">Night OT</Data></Cell>
-                          <Cell><Data ss:Type="String">Weekend OT</Data></Cell>
-                          <Cell><Data ss:Type="String">Holiday OT</Data></Cell>
-                        </Row>
-
-                        ${rows}
-
-                      </Table>
-                    </Worksheet>
-                  </Workbook>`
-
-                const blob = new Blob([xml], { type: "application/vnd.ms-excel" })
-                const url = URL.createObjectURL(blob)
-
-                const link = document.createElement("a")
-                link.href = url
-                link.download = `OT_Summary_${new Date().toISOString().slice(0, 10)}.xls`
-                link.click()
-              }}
-              className="bg-[#71a3c1] text-white px-4 py-2 rounded-lg"
-            >
-              Export Summary
-            </button>
-
-            {/* ✅ FULL EXPORT (SUMMARY + RAW) */}
+          {/* ✅ EXPORT FULL (UPDATED) */}
+          <div className="mb-4 flex justify-end">
             <button
               onClick={() => {
                 const summaryRows = entries.map(e => `
@@ -263,6 +223,7 @@ export default function AdminPage() {
                     <Cell><Data ss:Type="String">${e.date}</Data></Cell>
                     <Cell><Data ss:Type="String">${e.name}</Data></Cell>
                     <Cell><Data ss:Type="String">${e.type}</Data></Cell>
+                    <Cell><Data ss:Type="String">${getCategory(e.type)}</Data></Cell>
                     <Cell><Data ss:Type="Number">${e.hours}</Data></Cell>
                   </Row>
                 `).join("")
@@ -295,6 +256,7 @@ export default function AdminPage() {
                           <Cell><Data ss:Type="String">Date</Data></Cell>
                           <Cell><Data ss:Type="String">Name</Data></Cell>
                           <Cell><Data ss:Type="String">Type</Data></Cell>
+                          <Cell><Data ss:Type="String">Category</Data></Cell>
                           <Cell><Data ss:Type="String">Hours</Data></Cell>
                         </Row>
 
@@ -304,7 +266,10 @@ export default function AdminPage() {
                     </Worksheet>
                   </Workbook>`
 
-                const blob = new Blob([xml], { type: "application/vnd.ms-excel" })
+                const blob = new Blob([xml], {
+                  type: "application/vnd.ms-excel",
+                })
+
                 const url = URL.createObjectURL(blob)
 
                 const link = document.createElement("a")
@@ -316,47 +281,7 @@ export default function AdminPage() {
             >
               Export Full
             </button>
-
           </div>
-
-          {/* ✅ TABLE (UNCHANGED) */}
-          <table className="w-full text-sm border">
-            <thead className="bg-gray-200">
-              <tr>
-                <th className="p-2">Month</th>
-                <th className="p-2">Name</th>
-                <th className="p-2 cursor-pointer" onClick={() => handleSort("weekday")}>Weekday OT ⬍</th>
-                <th className="p-2 cursor-pointer" onClick={() => handleSort("night")}>Night OT ⬍</th>
-                <th className="p-2 cursor-pointer" onClick={() => handleSort("weekend")}>Weekend OT ⬍</th>
-                <th className="p-2 cursor-pointer" onClick={() => handleSort("holiday")}>Holiday OT ⬍</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {entries.map((entry, index) => (
-                <tr key={index} className="border-t">
-                  <td className="p-2">{selectedMonth || "All"}</td>
-                  <td className="p-2">{entry.name}</td>
-                  <td className="p-2">{entry.weekday}</td>
-                  <td className="p-2">{entry.night}</td>
-                  <td className="p-2">{entry.weekend}</td>
-                  <td className="p-2">{entry.holiday}</td>
-                </tr>
-              ))}
-            </tbody>
-
-            <tfoot>
-              <tr className="font-semibold bg-gray-100 border-t">
-                <td></td>
-                <td>TOTAL</td>
-                <td>{totalWeekday}</td>
-                <td>{totalNight}</td>
-                <td>{totalWeekend}</td>
-                <td>{totalHoliday}</td>
-              </tr>
-            </tfoot>
-
-          </table>
 
         </div>
       </div>
