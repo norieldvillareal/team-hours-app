@@ -57,7 +57,7 @@ export default function Navbar() {
       <div className="max-w-4xl mx-auto flex justify-between items-center px-6 py-3">
 
         <div className="font-semibold text-lg">
-          Project Overtime Hours
+          Overtime Hours
         </div>
 
         <div className="flex items-center gap-4">
