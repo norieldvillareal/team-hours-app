@@ -84,10 +84,10 @@ const router = useRouter()
     return
   }
 
-  if (Number(hours) > 24) {
-    setMessage("Hours cannot exceed 24.Get a life!")
-    return
-  }
+if (Number(hours) >= 24) {
+  setMessage("❌ Hours must be less than 24.")
+  return
+}
 
   const userName = allowedUsers[user.email]
 
