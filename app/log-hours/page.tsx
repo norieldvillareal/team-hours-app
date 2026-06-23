@@ -72,49 +72,66 @@ const router = useRouter()
 
   // ✅ Submit
   const handleSubmit = async () => {
-    setMessage("")
+  setMessage("")
 
-    if (!user) {
-      setMessage("❌ Please login first.")
-      return
-    }
-
-    if (!date || !hours || !type) {
-      setMessage("Please fill all required fields.")
-      return
-    }
-
-    if (Number(hours) > 24) {
-      setMessage("Hours cannot exceed 24.")
-      return
-    }
-
-    const { error } = await supabase
-      .from("time_entries")
-      .insert([
-        {
-          name: allowedUsers[user.email],
-          date,
-          hours: Number(hours),
-          type,
-          notes,
-        },
-      ])
-
-    if (error) {
-      console.error(error)
-      setMessage("❌ Failed to save entry.")
-      return
-    }
-
-    setMessage("✅ Entry saved successfully.")
-
-    // ✅ Reset form
-    setDate("")
-    setHours("")
-    setType("")
-    setNotes("")
+  if (!user) {
+    setMessage("❌ Please login first.")
+    return
   }
+
+  if (!date || !hours || !type) {
+    setMessage("Please fill all required fields.")
+    return
+  }
+
+  if (Number(hours) > 24) {
+    setMessage("Hours cannot exceed 24.")
+    return
+  }
+
+  const userName = allowedUsers[user.email]
+
+  // ✅ ✅ DUPLICATE CHECK (NEW)
+  const { data: existing } = await supabase
+    .from("time_entries")
+    .select("*")
+    .eq("name", userName)
+    .eq("date", date)
+    .eq("type", type)
+
+  if (existing && existing.length > 0) {
+    setMessage("❌ Duplicate entry: this date and type already exists.")
+    return
+  }
+
+  // ✅ INSERT (unchanged)
+  const { error } = await supabase
+    .from("time_entries")
+    .insert([
+      {
+        name: allowedUsers[user.email],
+        date,
+        hours: Number(hours),
+        type,
+        notes,
+      },
+    ])
+
+  if (error) {
+    console.error(error)
+    setMessage("❌ Failed to save entry.")
+    return
+  }
+
+  setMessage("✅ Entry saved successfully.")
+
+  // ✅ Reset form
+  setDate("")
+  setHours("")
+  setType("")
+  setNotes("")
+}
+
 
 if (loading) {
   return <div className="min-h-screen bg-[#c6dbdc]" />
