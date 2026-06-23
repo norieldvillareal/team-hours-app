@@ -58,7 +58,7 @@ const router = useRouter()
       }
 
       if (!allowedUsers[email]) {
-        alert("❌ You are not authorized to access this app")
+        alert("❌ You are not authorized to access this app.")
         router.push("/login")
         return
       }
@@ -85,7 +85,7 @@ const router = useRouter()
   }
 
   if (Number(hours) > 24) {
-    setMessage("Hours cannot exceed 24.")
+    setMessage("Hours cannot exceed 24.Get a life!")
     return
   }
 
@@ -100,7 +100,7 @@ const router = useRouter()
     .eq("type", type)
 
   if (existing && existing.length > 0) {
-    setMessage("❌ Duplicate entry: this date and type already exists.")
+    setMessage("❌ Duplicate entry. This Date and OT Type already exists.")
     return
   }
 
@@ -150,7 +150,8 @@ if (loading) {
           </h1>
 
           <p className="text-sm text-gray-700 mb-2">
-            Add your work hours for a specific day
+            Add your work hours for a specific day.
+            <br></br>
           </p>
 
           <p className="text-sm mb-4 text-gray-600">
@@ -171,7 +172,7 @@ if (loading) {
             value={type}
             onChange={(e) => setType(e.target.value)}
           >
-            <option value="">Select type</option>
+            <option value="">Select OT Type</option>
             <option value="Pre-Shift">Pre-Shift</option>
             <option value="Post-Shift">Post-Shift</option>
             <option value="Night Shift">Night Shift</option>
@@ -185,7 +186,7 @@ if (loading) {
           {/* ✅ Hours */}
           <input
             type="number"
-            placeholder="Hours"
+            placeholder="OT Hours"
             className="w-full border rounded-lg p-2 mb-3"
             value={hours}
             onChange={(e) => setHours(e.target.value)}
@@ -194,7 +195,7 @@ if (loading) {
           {/* ✅ Notes */}
           <textarea
             className="w-full border rounded-lg p-2 mb-3"
-            placeholder="Notes"
+            placeholder="Notes (Optional)"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
           />
