@@ -13,6 +13,17 @@ export default function TimesheetPage() {
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
 
+  const getCategory = (type: string) => {
+  if (!type) return ""
+
+  if (type === "Night Shift") return "Night OT"
+  if (type.includes("Weekend")) return "Weekend OT"
+  if (type.includes("Holiday")) return "Holiday OT"
+
+  return "Weekday OT"
+}
+
+
   const handleSort = (column: string) => {
   if (sortColumn === column) {
     setSortDirection(sortDirection === "asc" ? "desc" : "asc")
@@ -279,6 +290,59 @@ if (selectedMonth) {
               {isSubmitted ? "Already Submitted" : "Submit OT Hours"}
             </button>
           </div>
+
+<div className="mb-4 flex justify-end">
+  <button
+    onClick={() => {
+
+      const rows = entries.map(e => `
+        <Row>
+          <Cell><Data ss:Type="String">${e.date}</Data></Cell>
+          <Cell><Data ss:Type="String">${e.type}</Data></Cell>
+          <Cell><Data ss:Type="String">${getCategory(e.type)}</Data></Cell>
+          <Cell><Data ss:Type="Number">${e.hours}</Data></Cell>
+          <Cell><Data ss:Type="String">${e.notes || ""}</Data></Cell>
+        </Row>
+      `).join("")
+
+      const xml = `<?xml version="1.0"?>
+        <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+          xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+          <Worksheet ss:Name="My OT Data">
+            <Table>
+
+              <Row>
+                <Cell><Data ss:Type="String">Date</Data></Cell>
+                <Cell><Data ss:Type="String">Type</Data></Cell>
+                <Cell><Data ss:Type="String">Category</Data></Cell>
+                <Cell><Data ss:Type="String">Hours</Data></Cell>
+                <Cell><Data ss:Type="String">Notes</Data></Cell>
+              </Row>
+
+              ${rows}
+
+            </Table>
+          </Worksheet>
+        </Workbook>`
+
+      const blob = new Blob([xml], {
+        type: "application/vnd.ms-excel",
+      })
+
+      const url = URL.createObjectURL(blob)
+
+      const link = document.createElement("a")
+      link.href = url
+      link.download = `My_OT_${new Date().toISOString().slice(0, 10)}.xls`
+      link.click()
+    }}
+    className="bg-[#40948d] text-white px-4 py-2 rounded-lg hover:opacity-90"
+  >
+    Export My Data
+  </button>
+</div>
+
+
 
           {/* TABLE */}
           <table className="w-full text-sm border">
