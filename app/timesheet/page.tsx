@@ -346,7 +346,6 @@ if (selectedMonth) {
 
   </div>
 </div>
-</div>
 
 
 
