@@ -278,17 +278,18 @@ if (selectedMonth) {
               Total Hours: <strong>{totalHours}</strong>
             </div>
 
-            <button
-              onClick={() => setShowConfirm(true)}
-              disabled={isSubmitted}
-              className={`px-4 py-2 rounded-lg text-white ${
-                isSubmitted
-                  ? "bg-gray-400"
-                  : "bg-[#71a3c1]"
-              }`}
-            >
-              {isSubmitted ? "Already Submitted" : "Submit OT Hours"}
-            </button>
+<button
+  onClick={() => setShowConfirm(true)}
+  disabled={isSubmitted}
+  className={`px-4 py-2 rounded-lg text-white ${
+    isSubmitted
+      ? "bg-gray-400 cursor-not-allowed"
+      : "bg-[#40948d] hover:opacity-90"
+  }`}
+>
+  {isSubmitted ? "Already Submitted" : "Submit OT Hours"}
+</button>
+
           </div>
 
 <div className="mb-4 flex justify-end">
@@ -338,7 +339,7 @@ if (selectedMonth) {
     }}
     className="bg-[#40948d] text-white px-4 py-2 rounded-lg hover:opacity-90"
   >
-    Export My Data
+    Export Data
   </button>
 </div>
 
