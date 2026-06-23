@@ -6,7 +6,7 @@ import Navbar from "@/components/Navbar"
 import { useRouter } from "next/navigation"
 
 export default function TimesheetPage() {
-  const [sortColumn, setSortColumn] = useState("")
+  const [sortColumn, setSortColumn] = useState("date")
   const [sortDirection, setSortDirection] = useState("asc")
   const router = useRouter()
   const [entries, setEntries] = useState<any[]>([])
@@ -153,7 +153,7 @@ if (selectedMonth) {
       query = query.eq("type", selectedType)
     }
 
-    const { data } = await query.order("date", { ascending: false })
+    const { data } = await query.order("date", { ascending: true })
 
     setEntries(sortEntries(data || []))
     setLoading(false)

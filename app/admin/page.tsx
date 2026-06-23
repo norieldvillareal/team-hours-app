@@ -6,7 +6,7 @@ import Navbar from "@/components/Navbar"
 import { useRouter } from "next/navigation"
 
 export default function AdminPage() {
-  const [sortColumn, setSortColumn] = useState("")
+  const [sortColumn, setSortColumn] = useState("date")
   const [sortDirection, setSortDirection] = useState("asc")
   const ADMIN_EMAIL = "nvillareal@pingala.eu"
   const router = useRouter()
@@ -132,7 +132,7 @@ export default function AdminPage() {
       query = query.eq("type", selectedType)
     }
 
-    const { data } = await query.order("date", { ascending: false })
+    const { data } = await query.order("date", { ascending: true })
 
     let filteredData = data || []
 
