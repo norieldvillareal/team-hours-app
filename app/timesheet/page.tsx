@@ -667,7 +667,10 @@ await supabase
 
 
           {/* TABLE */}
-          <table className="w-full text-sm border table-fixed">
+          {/* TABLE */}
+<div className="w-full overflow-x-auto">
+  <table className="min-w-[900px] text-sm border table-fixed">
+
 
 <thead className="bg-gray-100 text-left">
   <tr>
@@ -675,7 +678,7 @@ await supabase
       Date ⬍
     </th>
 
-    <th className="p-2 w-[180px] cursor-pointer" onClick={() => handleSort("type")}>
+    <th className="p-2 w-[160px] cursor-pointer" onClick={() => handleSort("type")}>
       Name ⬍
     </th>
 
@@ -710,7 +713,7 @@ await supabase
       <td className="p-2">{entry.date}</td>
 
       {/* NAME */}
-<td className="p-2 whitespace-nowrap overflow-hidden text-ellipsis">
+<td className="p-2 max-w-[160px] truncate">
   {entry.name}
   {entry.name === allowedUsers[user?.email] && (
     <span className="text-[10px] text-gray-500 ml-1">(You)</span>
@@ -795,6 +798,7 @@ await supabase
 
 
           </table>
+          </div>
 
 
 
