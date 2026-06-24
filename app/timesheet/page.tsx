@@ -237,6 +237,13 @@ setEntries(sortEntries(filtered))
   }
 
   const handleAddEntry = async () => {
+  setMessage("")
+
+  if (!user) {
+    setMessage("❌ Please login first.")
+    return
+  }
+
   const userName = allowedUsers[user.email]
 
   if (!date || !hours || !type) {
@@ -244,11 +251,12 @@ setEntries(sortEntries(filtered))
     return
   }
 
-  if (Number(hours) > 24) {
-    setMessage("Hours cannot exceed 24.")
+  if (Number(hours) >= 24) {
+    setMessage("❌ Hours must be less than 24.")
     return
   }
 
+  // ✅ DUPLICATE CHECK
   const { data: existing } = await supabase
     .from("time_entries")
     .select("*")
@@ -257,22 +265,38 @@ setEntries(sortEntries(filtered))
     .eq("type", type)
 
   if (existing && existing.length > 0) {
-    setMessage("❌ Duplicate entry exists.")
+    setMessage("❌ Duplicate entry. This Date and OT Type already exists.")
     return
   }
 
-  await supabase.from("time_entries").insert([
-    {
-      name: userName,
-      date,
-      hours: Number(hours),
-      type,
-      notes,
-    },
-  ])
+  // ✅ INSERT
+  const { error } = await supabase
+    .from("time_entries")
+    .insert([
+      {
+        name: userName,
+        date,
+        hours: Number(hours),
+        type,
+        notes,
+      },
+    ])
 
-  setMessage("✅ Entry added")
+  if (error) {
+    console.error(error)
 
+    if (error.code === "23505") {
+      setMessage("❌ Duplicate entry (database).")
+    } else {
+      setMessage("❌ Failed to save entry.")
+    }
+
+    return
+  }
+
+  setMessage("✅ Entry saved successfully.")
+
+  // ✅ RESET FORM
   setDate("")
   setHours("")
   setType("")
@@ -280,6 +304,7 @@ setEntries(sortEntries(filtered))
 
   fetchEntries(user.email)
 }
+
 
 
   //if (loading) return <div className="p-6">Loading...</div>
@@ -486,18 +511,28 @@ setEntries(sortEntries(filtered))
     <th className="p-2 cursor-pointer" onClick={() => handleSort("date")}>
       Date ⬍
     </th>
+
     <th className="p-2 cursor-pointer" onClick={() => handleSort("type")}>
-    <th className="p-2">Category</th>
       Type ⬍
     </th>
+
+    <th
+      className="p-2 cursor-pointer"
+      onClick={() => handleSort("type")}
+    >
+      Category ⬍
+    </th>
+
     <th className="p-2 cursor-pointer" onClick={() => handleSort("hours")}>
       Hours ⬍
     </th>
+
     <th className="p-2">Status</th>
     <th className="p-2">Notes</th>
     <th className="p-2">Actions</th>
   </tr>
 </thead>
+
 
 
             <tbody>
