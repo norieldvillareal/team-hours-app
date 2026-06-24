@@ -147,7 +147,14 @@ useEffect(() => {
   if (user) {
     fetchEntries()
   }
-}, [user, selectedMonth, selectedType, selectedCategory, selectedName])
+}, [selectedName])
+
+
+useEffect(() => {
+  if (user) {
+    fetchEntries()
+  }
+}, [user, selectedMonth, selectedType, selectedCategory])
 
   useEffect(() => {
   setEntries((prev) => sortEntries(prev))
