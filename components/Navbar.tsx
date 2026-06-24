@@ -85,9 +85,10 @@ export default function Navbar() {
       {/* ✅ NAV LINKS */}
       <div className="max-w-4xl mx-auto flex gap-4 px-6 pb-3">
 
-        <Link href="/log-hours" className={linkClass("/log-hours")}>
+        {/*//<Link href="/log-hours" className={linkClass("/log-hours")}>
           File Overtime
         </Link>
+        */}
 
         <Link href="/timesheet" className={linkClass("/timesheet")}>
           My Overtime
