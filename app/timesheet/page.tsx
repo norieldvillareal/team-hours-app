@@ -302,56 +302,6 @@ setEntries(sortEntries(filtered))
             Logged in as: {allowedUsers[user.email]}
           </p>
 
-          {/* ✅ FILTERS */}
-          <div className="mb-4 grid grid-cols-3 gap-3">
-
-            <div>
-              <label className="block text-sm mb-1">Month</label>
-              <input
-                type="month"
-                value={selectedMonth}
-                onChange={(e) => setSelectedMonth(e.target.value)}
-                className="w-full border rounded-lg p-2"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm mb-1">Type</label>
-              <select
-                value={selectedType}
-                onChange={(e) => setSelectedType(e.target.value)}
-                className="w-full border rounded-lg p-2"
-              >
-                <option value="All">All</option>
-                <option value="Pre-Shift">Pre-Shift</option>
-                <option value="Post-Shift">Post-Shift</option>
-                <option value="Night Shift">Night Shift</option>
-                <option value="Weekend HC">Weekend HC</option>
-                <option value="Weekend Shift">Weekend Shift</option>
-                <option value="Weekend Release">Weekend Release</option>
-                <option value="Weekend Patching">Weekend Patching</option>
-                <option value="Holiday Shift">Holiday Shift</option>
-              </select>
-            </div>
-<div>
-  <label className="block text-sm mb-1">Category</label>
-  <select
-    value={selectedCategory}
-    onChange={(e) => setSelectedCategory(e.target.value)}
-    className="w-full border rounded-lg p-2"
-  >
-    <option value="All">All</option>
-    <option value="Weekday OT">Weekday OT</option>
-    <option value="Night OT">Night OT</option>
-    <option value="Weekend OT">Weekend OT</option>
-    <option value="Holiday OT">Holiday OT</option>
-  </select>
-</div>
-
-
-          </div>
-
-{/* ✅ ADD ENTRY FORM */}
 {/* ✅ ADD ENTRY FORM (ONE LINE) */}
 <div className="mb-6 grid grid-cols-5 gap-2 items-center">
 
@@ -401,6 +351,55 @@ setEntries(sortEntries(filtered))
   </button>
 
 </div>
+
+          {/* ✅ FILTERS */}
+          <div className="mb-4 grid grid-cols-3 gap-3">
+
+            <div>
+              <label className="block text-sm mb-1">Month</label>
+              <input
+                type="month"
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(e.target.value)}
+                className="w-full border rounded-lg p-2"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm mb-1">Type</label>
+              <select
+                value={selectedType}
+                onChange={(e) => setSelectedType(e.target.value)}
+                className="w-full border rounded-lg p-2"
+              >
+                <option value="All">All</option>
+                <option value="Pre-Shift">Pre-Shift</option>
+                <option value="Post-Shift">Post-Shift</option>
+                <option value="Night Shift">Night Shift</option>
+                <option value="Weekend HC">Weekend HC</option>
+                <option value="Weekend Shift">Weekend Shift</option>
+                <option value="Weekend Release">Weekend Release</option>
+                <option value="Weekend Patching">Weekend Patching</option>
+                <option value="Holiday Shift">Holiday Shift</option>
+              </select>
+            </div>
+<div>
+  <label className="block text-sm mb-1">Category</label>
+  <select
+    value={selectedCategory}
+    onChange={(e) => setSelectedCategory(e.target.value)}
+    className="w-full border rounded-lg p-2"
+  >
+    <option value="All">All</option>
+    <option value="Weekday OT">Weekday OT</option>
+    <option value="Night OT">Night OT</option>
+    <option value="Weekend OT">Weekend OT</option>
+    <option value="Holiday OT">Holiday OT</option>
+  </select>
+</div>
+
+
+          </div>
 
 
 {/* HEADER */}
