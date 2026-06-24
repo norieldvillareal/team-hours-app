@@ -806,10 +806,6 @@ onClick={() =>
     () => handleDelete(entry.id)
   )
 }
-        ) {
-          handleDelete(entry.id)
-        }
-      }}
       className="text-red-500 text-xs"
     >
       Delete
@@ -852,7 +848,7 @@ onClick={() =>
 
         </div>
       </div>
-      
+
 {modalOpen && (
   <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
 
