@@ -113,11 +113,18 @@ const handleKeyDown = (e: React.KeyboardEvent) => {
   })
 }
 
+useEffect(() => {
+  if (isAdmin) {
+    setSelectedName("All")
+  }
+}, [user])
 
   useEffect(() => {
     const getUser = async () => {
       const { data } = await supabase.auth.getUser()
       const email = data.user?.email
+
+      
 
       if (!email) {
         router.push("/login")
@@ -160,11 +167,17 @@ const handleKeyDown = (e: React.KeyboardEvent) => {
 let query = supabase
   .from("time_entries")
   .select("*")
-  if (!isAdmin) {
+
+// ✅ NORMAL USER → only own data
+if (!isAdmin) {
   query = query.eq("name", userName)
-} else if (selectedName !== "All") {
+}
+
+// ✅ ADMIN → filter only if specific name selected
+if (isAdmin && selectedName !== "All") {
   query = query.eq("name", selectedName)
 }
+
 
 
 
