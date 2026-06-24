@@ -628,21 +628,30 @@ setEntries(sortEntries(filtered))
             </tbody>
           </table>
 
-{/* ✅ TOTALS BY CATEGORY */}
-<div className="border border-t-0 rounded-b-lg bg-gray-50 px-4 py-3">
+{/* ✅ TOTALS BY CATEGORY (TABLE STYLE) */}
+<div className="mt-4">
 
-  <h3 className="font-semibold mb-2">Breakdown by Category</h3>
+  <table className="w-full text-sm border rounded-lg overflow-hidden">
+    
+    <thead className="bg-gray-100">
+      <tr>
+        <th className="p-2 text-center">Weekday OT</th>
+        <th className="p-2 text-center">Night OT</th>
+        <th className="p-2 text-center">Weekend OT</th>
+        <th className="p-2 text-center">Holiday OT</th>
+      </tr>
+    </thead>
 
-  <div className="grid grid-cols-2 gap-2 text-sm">
-    {Object.entries(totalsByCategory as Record<string, number>).map(
-      ([category, total]) => (
-        <div key={category} className="flex justify-between">
-          <span>{category}</span>
-          <span className="font-semibold">{total}</span>
-        </div>
-      )
-    )}
-  </div>
+    <tbody>
+      <tr className="text-center font-semibold">
+        <td className="p-2">{totalsByCategory["Weekday OT"] || 0}</td>
+        <td className="p-2">{totalsByCategory["Night OT"] || 0}</td>
+        <td className="p-2">{totalsByCategory["Weekend OT"] || 0}</td>
+        <td className="p-2">{totalsByCategory["Holiday OT"] || 0}</td>
+      </tr>
+    </tbody>
+
+  </table>
 
 </div>
 
