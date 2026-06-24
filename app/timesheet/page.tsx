@@ -266,14 +266,15 @@ setEntries(sortEntries(filtered))
   const handleUpdate = async () => {
     if (!editingEntry) return
 
-    await supabase
-      .from("time_entries")
-      .update({
-        date: editingEntry.date,
-        hours: editingEntry.hours,
-        notes: editingEntry.notes,
-        status: "Draft", // ✅ add this
-      })
+await supabase
+  .from("time_entries")
+  .update({
+    date: editingEntry.date,
+    hours: editingEntry.hours,
+    notes: editingEntry.notes,
+    status: "Draft",
+    overridden: isAdmin ? true : false, // ✅ ADD THIS
+  })
       .eq("id", editingEntry.id)
 
     setEditingEntry(null)
@@ -660,27 +661,37 @@ setEntries(sortEntries(filtered))
       {/* HOURS */}
       <td className="p-2">{entry.hours}</td>
 
-      {/* STATUS */}
+      {/* ✅ STATUS + OVERRIDE */}
       <td className="p-2">
-        <span
-          className={`px-3 py-1 text-xs font-semibold rounded-full ${
-            entry.status === "Submitted"
-              ? "bg-[#6dbfb8] text-black"
-              : "bg-[#fec76f] text-black"
-          }`}
-        >
-          {entry.status || "Draft"}
-        </span>
+        <div className="flex flex-col gap-1">
+
+          <span
+            className={`px-3 py-1 text-xs font-semibold rounded-full ${
+              entry.status === "Submitted"
+                ? "bg-[#6dbfb8] text-black"
+                : "bg-[#fec76f] text-black"
+            }`}
+          >
+            {entry.status || "Draft"}
+          </span>
+
+          {entry.overridden && (
+            <span className="text-[10px] text-orange-600 font-semibold">
+              Overridden by Admin
+            </span>
+          )}
+
+        </div>
       </td>
 
       {/* NOTES */}
       <td className="p-2">{entry.notes}</td>
 
-      {/* ACTIONS */}
+      {/* ✅ ACTIONS */}
       <td className="p-2">
         <div className="flex gap-2">
 
-          {/* ✅ NORMAL USER */}
+          {/* NORMAL USER */}
           {entry.status !== "Submitted" && (
             <>
               <button
@@ -699,7 +710,7 @@ setEntries(sortEntries(filtered))
             </>
           )}
 
-          {/* ✅ ADMIN */}
+          {/* ADMIN */}
           {entry.status === "Submitted" && isAdmin && selectedName !== "All" && (
             <button
               onClick={() => setEditingEntry(entry)}
@@ -715,6 +726,7 @@ setEntries(sortEntries(filtered))
     </tr>
   ))}
 </tbody>
+
 
 
           </table>
