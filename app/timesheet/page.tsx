@@ -94,6 +94,7 @@ const handleKeyDown = (e: React.KeyboardEvent) => {
     "nvillareal@pingala.eu": "Noriel Villareal",
     "norieldvillareal@gmail.com": "Noriel GMAIL",
   }
+  const currentUserName = allowedUsers[user?.email]
 
   const sortEntries = (data: any[]) => {
   if (!sortColumn) return data
@@ -306,13 +307,17 @@ setEntries(sortEntries(filtered))
   }
 
   // ✅ DELETE
-  const handleDelete = async (id: number) => {
-  if (isAdmin) return // ✅ BLOCK ADMIN
+const handleDelete = async (id: number) => {
+  const userName = allowedUsers[user?.email]
+  const entry = entries.find(e => e.id === id)
+
+  if (entry?.name !== userName) return // ✅ only allow own
 
   await supabase.from("time_entries").delete().eq("id", id)
   setMessage("✅ Entry deleted")
   fetchEntries()
 }
+
 
 
 
@@ -764,7 +769,7 @@ await supabase
         <div className="flex gap-2">
 
           {/* NORMAL USER */}
-{!isAdmin && entry.status !== "Submitted" && (
+{entry.name === currentUserName && entry.status !== "Submitted" && (
   <>
     <button
       onClick={() => setEditingEntry(entry)}
@@ -782,15 +787,19 @@ await supabase
   </>
 )}
 
+
           {/* ADMIN */}
-          {entry.status === "Submitted" && isAdmin && selectedName !== "All" && (
-            <button
-              onClick={() => setEditingEntry(entry)}
-              className="text-orange-500 text-xs"
-            >
-              Override
-            </button>
-          )}
+{isAdmin &&
+  entry.name !== currentUserName &&
+  entry.status === "Submitted" && (
+    <button
+      onClick={() => setEditingEntry(entry)}
+      className="text-orange-500 text-xs"
+    >
+      Override
+    </button>
+)}
+
 
         </div>
       </td>
