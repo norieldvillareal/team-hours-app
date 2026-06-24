@@ -198,6 +198,19 @@ setEntries(sortEntries(filtered))
     0
   )
 
+  const totalsByCategory = entries.reduce((acc, entry) => {
+  const category = getCategory(entry.type)
+  const hrs = Number(entry.hours) || 0
+
+  if (!acc[category]) {
+    acc[category] = 0
+  }
+
+  acc[category] += hrs
+
+  return acc
+}, {} as Record<string, number>)
+
   const isSubmitted =
     entries.length > 0 &&
     entries.every((entry) => entry.status === "Submitted")
@@ -465,7 +478,7 @@ setEntries(sortEntries(filtered))
 {/* HEADER */}
 <div className="mb-4 flex justify-between items-center">
   <div className="text-lg">
-    My OT for this month: <strong>{totalHours}</strong>
+    Total hours for the month: <strong>{totalHours}</strong>
   </div>
 
   {/* ✅ BUTTON GROUP */}
@@ -614,6 +627,25 @@ setEntries(sortEntries(filtered))
               ))}
             </tbody>
           </table>
+
+{/* ✅ TOTALS BY CATEGORY */}
+<div className="border border-t-0 rounded-b-lg bg-gray-50 px-4 py-3">
+
+  <h3 className="font-semibold mb-2">Breakdown by Category</h3>
+
+  <div className="grid grid-cols-2 gap-2 text-sm">
+    {Object.entries(totalsByCategory as Record<string, number>).map(
+      ([category, total]) => (
+        <div key={category} className="flex justify-between">
+          <span>{category}</span>
+          <span className="font-semibold">{total}</span>
+        </div>
+      )
+    )}
+  </div>
+
+</div>
+
 
         </div>
       </div>
