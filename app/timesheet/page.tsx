@@ -173,6 +173,11 @@ let query = supabase
   .from("time_entries")
   .select("*")
 
+// ✅ ALWAYS get ALL data for admin (for dropdown)
+let allQuery = supabase
+  .from("time_entries")
+  .select("*")
+
 // ✅ NORMAL USER
 if (!isAdmin) {
   query = query.eq("name", userName)
@@ -208,9 +213,13 @@ if (selectedMonth) {
       query = query.eq("type", selectedType)
     }
 
+// ✅ get ALL entries (for dropdown)
+const { data: allData } = await allQuery
+setAllEntries(allData || [])
+
+// ✅ get filtered entries (for table)
 const { data } = await query.order("date", { ascending: true })
 
-setAllEntries(data || []) // ✅ ADD THIS
 
 let filtered = data || []
 
