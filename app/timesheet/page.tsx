@@ -307,15 +307,18 @@ setEntries(sortEntries(filtered))
 
   // ✅ DELETE
   const handleDelete = async (id: number) => {
-    await supabase.from("time_entries").delete().eq("id", id)
-    setMessage("✅ Entry deleted")
-    fetchEntries()
-  }
+  if (isAdmin) return // ✅ BLOCK ADMIN
+
+  await supabase.from("time_entries").delete().eq("id", id)
+  setMessage("✅ Entry deleted")
+  fetchEntries()
+}
 
 
 
   // ✅ UPDATE
   const handleUpdate = async () => {
+    if (isAdmin) return
     if (!editingEntry) return
 
 await supabase
@@ -761,23 +764,23 @@ await supabase
         <div className="flex gap-2">
 
           {/* NORMAL USER */}
-          {entry.status !== "Submitted" && (
-            <>
-              <button
-                onClick={() => setEditingEntry(entry)}
-                className="text-blue-500 text-xs"
-              >
-                Edit
-              </button>
+{!isAdmin && entry.status !== "Submitted" && (
+  <>
+    <button
+      onClick={() => setEditingEntry(entry)}
+      className="text-blue-500 text-xs"
+    >
+      Edit
+    </button>
 
-              <button
-                onClick={() => handleDelete(entry.id)}
-                className="text-red-500 text-xs"
-              >
-                Delete
-              </button>
-            </>
-          )}
+    <button
+      onClick={() => handleDelete(entry.id)}
+      className="text-red-500 text-xs"
+    >
+      Delete
+    </button>
+  </>
+)}
 
           {/* ADMIN */}
           {entry.status === "Submitted" && isAdmin && selectedName !== "All" && (
