@@ -477,12 +477,12 @@ setEntries(sortEntries(filtered))
 
 {/* HEADER */}
 <div className="mb-4 flex justify-between items-center">
-  <div className="text-lg">
+  {/* <div className="text-lg">
     Total hours for the month: <strong>{totalHours}</strong>
-  </div>
-  
+  </div>*/}
+
 {/* ✅ TOTALS BY CATEGORY (TABLE STYLE) */}
-<div className="mt-4">
+<div className="mb-4">
 
   <table className="w-full text-sm border rounded-lg overflow-hidden">
     
@@ -492,6 +492,7 @@ setEntries(sortEntries(filtered))
         <th className="p-2 text-center">Night OT</th>
         <th className="p-2 text-center">Weekend OT</th>
         <th className="p-2 text-center">Holiday OT</th>
+        <th className="p-2 text-center font-bold">Total</th>
       </tr>
     </thead>
 
@@ -501,12 +502,14 @@ setEntries(sortEntries(filtered))
         <td className="p-2">{totalsByCategory["Night OT"] || 0}</td>
         <td className="p-2">{totalsByCategory["Weekend OT"] || 0}</td>
         <td className="p-2">{totalsByCategory["Holiday OT"] || 0}</td>
+        <td className="p-2 font-bold">{totalHours}</td>
       </tr>
     </tbody>
 
   </table>
 
 </div>
+
   {/* ✅ BUTTON GROUP */}
   <div className="flex gap-2">
 
