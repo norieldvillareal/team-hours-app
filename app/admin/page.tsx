@@ -303,7 +303,7 @@ export default function AdminPage() {
       link.download = `OT_Full_${new Date().toISOString().slice(0, 10)}.xls`
       link.click()
     }}
-    className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:opacity-90"
+    className="w-[180px] text-center bg-[#40948d] text-white px-4 py-2 rounded-lg hover:opacity-90"
   >
     Export Data
   </button>
