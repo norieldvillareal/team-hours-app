@@ -771,7 +771,7 @@ await supabase
       <td className="p-2">
         <div className="flex gap-2">
 
-          {/* NORMAL USER */}
+{/* NORMAL USER */}
 {entry.name === currentUserName && entry.status !== "Submitted" && (
   <>
     <button
@@ -782,7 +782,15 @@ await supabase
     </button>
 
     <button
-      onClick={() => handleDelete(entry.id)}
+      onClick={() => {
+        if (
+          confirm(
+            `Delete (${entry.hours}h) of ${entry.type} on ${entry.date}?`
+          )
+        ) {
+          handleDelete(entry.id)
+        }
+      }}
       className="text-red-500 text-xs"
     >
       Delete
@@ -790,16 +798,24 @@ await supabase
   </>
 )}
 
-
-          {/* ADMIN */}
+{/* ✅ ADMIN (OUTSIDE) */}
 {isAdmin && entry.status === "Submitted" && (
-    <button
-      onClick={() => setEditingEntry(entry)}
-      className="text-orange-500 text-xs"
-    >
-      Override
-    </button>
+  <button
+    onClick={() => {
+      if (
+        confirm(
+          `Override this submitted entry and revert it to Draft?`
+        )
+      ) {
+        setEditingEntry(entry)
+      }
+    }}
+    className="text-orange-500 text-xs"
+  >
+    Override
+  </button>
 )}
+
 
 
         </div>
