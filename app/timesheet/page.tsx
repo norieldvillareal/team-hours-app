@@ -14,7 +14,8 @@ export default function TimesheetPage() {
   const [user, setUser] = useState<any>(null)
   
   const [selectedName, setSelectedName] = useState("All")
-  const isAdmin = user?.email === "nvillareal@pingala.eu"
+  const isAdmin = user && user.email === "nvillareal@pingala.eu"
+const [allEntries, setAllEntries] = useState<any[]>([])
 
 
 
@@ -189,9 +190,11 @@ if (selectedMonth) {
       query = query.eq("type", selectedType)
     }
 
-    const { data } = await query.order("date", { ascending: true })
+const { data } = await query.order("date", { ascending: true })
 
-    let filtered = data || []
+setAllEntries(data || []) // ✅ ADD THIS
+
+let filtered = data || []
 
 if (selectedCategory !== "All") {
   filtered = filtered.filter(
@@ -491,7 +494,7 @@ setEntries(sortEntries(filtered))
       className="w-full border rounded-lg p-2"
     >
       <option value="All">All</option>
-      {[...new Set(entries.map(e => e.name))].map((name) => (
+      {[...new Set(allEntries.map(e => e.name))].map((name) => (
         <option key={name} value={name}>
           {name}
         </option>
@@ -640,75 +643,71 @@ setEntries(sortEntries(filtered))
 
 
 
-            <tbody>
-              {entries.map((entry) => (
-                <tr key={entry.id} className="border-t">
-                  <td className="p-2">{entry.date}</td>
-                  <td className="p-2">{entry.type}</td>
-                  <td className="p-2">{getCategory(entry.type)}</td>
-                  <td className="p-2">{entry.hours}</td>
-                  <td className="p-2">
-  <span
-    className={`px-3 py-1 text-xs font-semibold rounded-full ${
-      entry.status === "Submitted"
-        ? "bg-[#6dbfb8] text-black"
-        : "bg-[#fec76f] text-black"
-    }`}
-  >
-    {entry.status || "Draft"}
-  </span>
-</td>
+<tbody>
+  {entries.map((entry) => (
+    <tr key={entry.id} className="border-t">
 
-                  <td className="p-2">{entry.notes}</td>
+      <td className="p-2">{entry.date}</td>
+      <td className="p-2">{entry.type}</td>
+      <td className="p-2">{getCategory(entry.type)}</td>
+      <td className="p-2">{entry.hours}</td>
 
-                  <td className="p-2">
-                    <div className="flex gap-2">
-
-  <td className="p-2">
-  <div className="flex gap-2">
-
-<td className="p-2">
-  <div className="flex gap-2">
-
-    {/* ✅ NORMAL USER ACTIONS */}
-    {entry.status !== "Submitted" && (
-      <>
-        <button
-          onClick={() => setEditingEntry(entry)}
-          className="text-blue-500 text-xs"
+      {/* ✅ STATUS */}
+      <td className="p-2">
+        <span
+          className={`px-3 py-1 text-xs font-semibold rounded-full ${
+            entry.status === "Submitted"
+              ? "bg-[#6dbfb8] text-black"
+              : "bg-[#fec76f] text-black"
+          }`}
         >
-          Edit
-        </button>
+          {entry.status || "Draft"}
+        </span>
+      </td>
 
-        <button
-          onClick={() => handleDelete(entry.id)}
-          className="text-red-500 text-xs"
-        >
-          Delete
-        </button>
-      </>
-    )}
+      {/* ✅ NOTES */}
+      <td className="p-2">{entry.notes}</td>
 
-    {/* ✅ ADMIN OVERRIDE */}
-    {entry.status === "Submitted" && isAdmin && selectedName !== "All" && (
-      <button
-        onClick={() => setEditingEntry(entry)}
-        className="text-orange-500 text-xs"
-      >
-        Override
-      </button>
-    )}
+      {/* ✅ ACTIONS */}
+      <td className="p-2">
+        <div className="flex gap-2">
 
-  </div>
-</td>
+          {/* ✅ NORMAL USER */}
+          {entry.status !== "Submitted" && (
+            <>
+              <button
+                onClick={() => setEditingEntry(entry)}
+                className="text-blue-500 text-xs"
+              >
+                Edit
+              </button>
 
+              <button
+                onClick={() => handleDelete(entry.id)}
+                className="text-red-500 text-xs"
+              >
+                Delete
+              </button>
+            </>
+          )}
 
-</div>
+          {/* ✅ ADMIN */}
+          {entry.status === "Submitted" && isAdmin && selectedName !== "All" && (
+            <button
+              onClick={() => setEditingEntry(entry)}
+              className="text-orange-500 text-xs"
+            >
+              Override
+            </button>
+          )}
 
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+        </div>
+      </td>
+
+    </tr>
+  ))}
+</tbody>
+
           </table>
 
 
