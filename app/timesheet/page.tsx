@@ -486,7 +486,7 @@ setEntries(sortEntries(filtered))
 
   <table className="w-full text-sm border rounded-lg overflow-hidden">
     
-    <thead className="bg-[#6dbfb8] text-black">
+    <thead className="bg-[#be95be] text-black">
       <tr>
         <th className="p-2 text-center">Weekday</th>
         <th className="p-2 text-center">Night</th>
