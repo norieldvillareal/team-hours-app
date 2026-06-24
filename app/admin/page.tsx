@@ -312,7 +312,7 @@ export default function AdminPage() {
 
           {/* ✅ TABLE */}
           <table className="w-full text-sm border">
-            <thead className="bg-gray-200">
+            <thead className="bg-gray-100 text-left">
               <tr>
                 <th className="p-2">Month</th>
                 <th className="p-2">Name</th>
