@@ -406,7 +406,7 @@ setEntries(sortEntries(filtered))
         : "bg-[#40948d] hover:opacity-90"
     }`}
   >
-    Add
+    File OT
   </button>
 
 </form>
@@ -541,7 +541,7 @@ setEntries(sortEntries(filtered))
 
           {/* TABLE */}
           <table className="w-full text-sm border">
-<thead className="bg-gray-100">
+<thead className="bg-gray-100 text-left">
   <tr>
     <th className="p-2 cursor-pointer" onClick={() => handleSort("date")}>
       Date ⬍
