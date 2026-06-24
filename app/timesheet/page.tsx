@@ -785,8 +785,8 @@ await supabase
       onClick={() => {
         if (
           confirm(
-            `Delete (${entry.hours}h) of ${entry.type} on ${entry.date}?`
-          )
+  `This will permanently delete ${entry.type} with (${entry.hours} hour(s)) on ${entry.date}. Continue?`
+)
         ) {
           handleDelete(entry.id)
         }
