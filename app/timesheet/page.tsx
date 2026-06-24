@@ -581,8 +581,8 @@ setEntries(sortEntries(filtered))
   <span
     className={`px-3 py-1 text-xs font-semibold rounded-full ${
       entry.status === "Submitted"
-        ? "bg-[#75ba75] text-black"
-        : "bg-[#be95be] text-black"
+        ? "bg-[#6dbfb8] text-black"
+        : "bg-[#fec76f] text-black"
     }`}
   >
     {entry.status || "Draft"}
