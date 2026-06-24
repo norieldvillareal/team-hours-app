@@ -323,7 +323,6 @@ const handleDelete = async (id: number) => {
 
   // ✅ UPDATE
   const handleUpdate = async () => {
-    if (isAdmin) return
     if (!editingEntry) return
 
 await supabase
