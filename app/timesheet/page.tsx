@@ -138,21 +138,26 @@ useEffect(() => {
       }
 
       setUser(data.user)
-      fetchEntries(email)
     }
 
     getUser()
   }, [selectedMonth, selectedType, selectedCategory, selectedName])
 
+useEffect(() => {
+  if (user) {
+    fetchEntries()
+  }
+}, [user, selectedMonth, selectedType, selectedCategory, selectedName])
 
   useEffect(() => {
   setEntries((prev) => sortEntries(prev))
 }, [sortColumn, sortDirection])
 
-  const fetchEntries = async (email: string) => {
-    setLoading(true)
+const fetchEntries = async () => {
+  if (!user) return
 
-    const userName = allowedUsers[email]
+  const userName = allowedUsers[user.email]
+
 
     const startDate = `${selectedMonth}-01`
 
@@ -168,12 +173,12 @@ let query = supabase
   .from("time_entries")
   .select("*")
 
-// ✅ NORMAL USER → only own entries
+// ✅ NORMAL USER
 if (!isAdmin) {
   query = query.eq("name", userName)
 }
 
-// ✅ ADMIN → filter ONLY when specific name selected
+// ✅ ADMIN FILTER
 if (isAdmin && selectedName !== "All") {
   query = query.eq("name", selectedName)
 }
@@ -263,14 +268,14 @@ setEntries(sortEntries(filtered))
       .lte("date", endDate)
 
     setMessage("✅ OT hours submitted")
-    fetchEntries(user.email)
+    fetchEntries()
   }
 
   // ✅ DELETE
   const handleDelete = async (id: number) => {
     await supabase.from("time_entries").delete().eq("id", id)
     setMessage("✅ Entry deleted")
-    fetchEntries(user.email)
+    fetchEntries()
   }
 
 
@@ -292,7 +297,7 @@ await supabase
 
     setEditingEntry(null)
     setMessage("✅ Entry updated")
-    fetchEntries(user.email)
+    fetchEntries()
   }
 
   const handleAddEntry = async () => {
@@ -361,7 +366,7 @@ await supabase
   setType("")
   setNotes("")
 
-  fetchEntries(user.email)
+  fetchEntries()
 }
 
 
