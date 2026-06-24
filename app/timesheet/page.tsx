@@ -421,7 +421,7 @@ await supabase
             My Overtime
           </h1>
 
-          {/*<p className="text-sm mb-4 text-gray-600">
+          {/*<p className="text-xs mb-4 text-gray-600">
             Logged in as: {allowedUsers[user.email]}
           </p>*/}
 
@@ -497,7 +497,7 @@ await supabase
 
 
             <div>
-              <label className="block text-sm font-semibold mb-1">Month</label>
+              <label className="block text-xs font-semibold mb-1">Month</label>
               <input
                 type="month"
                 value={selectedMonth}
@@ -507,7 +507,7 @@ await supabase
             </div>
 
             <div>
-              <label className="block text-sm font-semibold mb-1">Type</label>
+              <label className="block text-xs font-semibold mb-1">Type</label>
               <select
                 value={selectedType}
                 onChange={(e) => setSelectedType(e.target.value)}
@@ -525,7 +525,7 @@ await supabase
               </select>
             </div>
 <div>
-  <label className="block text-sm font-semibold mb-1">Category</label>
+  <label className="block text-xs font-semibold mb-1">Category</label>
   <select
     value={selectedCategory}
     onChange={(e) => setSelectedCategory(e.target.value)}
@@ -541,7 +541,7 @@ await supabase
 
 {isAdmin && (
   <div>
-    <label className="block text-sm font-semibold mb-1">Name</label>
+    <label className="block text-xs font-semibold mb-1">Name</label>
     <select
       value={selectedName}
       onChange={(e) => setSelectedName(e.target.value)}
@@ -569,7 +569,7 @@ await supabase
 {/* ✅ TOTALS BY CATEGORY (TABLE STYLE) */}
 <div className="mb-3">
 
-  <table className="w-full text-sm border rounded-lg overflow-hidden">
+  <table className="w-full text-xs border rounded-lg overflow-hidden">
     
     <thead className="bg-[#be95be] text-black">
       <tr>
@@ -667,9 +667,8 @@ await supabase
 
 
           {/* TABLE */}
-          {/* TABLE */}
-<div className="w-full overflow-x-auto">
-  <table className="min-w-[900px] text-sm border table-fixed">
+<div className="w-full">
+  <table className="w-full text-xs border table-fixed">
 
 
 <thead className="bg-gray-100 text-left">
@@ -845,7 +844,7 @@ await supabase
 
       {/* ✅ DATE */}
       <div className="mb-3">
-        <label className="block text-sm mb-1">Date</label>
+        <label className="block text-xs mb-1">Date</label>
         <input
           type="date"
           value={editingEntry.date}
@@ -858,7 +857,7 @@ await supabase
 
       {/* ✅ HOURS */}
       <div className="mb-3">
-        <label className="block text-sm mb-1">Hours</label>
+        <label className="block text-xs mb-1">Hours</label>
         <input
           type="number"
           value={editingEntry.hours}
@@ -871,7 +870,7 @@ await supabase
 
       {/* ✅ NOTES */}
       <div className="mb-4">
-        <label className="block text-sm mb-1">Notes</label>
+        <label className="block text-xs mb-1">Notes</label>
         <textarea
           value={editingEntry.notes}
           onChange={(e) =>
