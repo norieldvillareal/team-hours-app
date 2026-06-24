@@ -667,31 +667,32 @@ await supabase
 
 
           {/* TABLE */}
-          <table className="w-full text-sm border">
+          <table className="w-full text-sm border table-fixed">
+
 <thead className="bg-gray-100 text-left">
   <tr>
-    <th className="p-2 cursor-pointer" onClick={() => handleSort("date")}>
+    <th className="p-2 w-[120px] cursor-pointer" onClick={() => handleSort("date")}>
       Date ⬍
     </th>
 
-    <th className="p-2 cursor-pointer" onClick={() => handleSort("type")}>
+    <th className="p-2 w-[140px] cursor-pointer" onClick={() => handleSort("type")}>
       Type ⬍
     </th>
 
     <th
-      className="p-2 cursor-pointer"
+      className="p-2  w-[140px] cursor-pointer"
       onClick={() => handleSort("type")}
     >
       Category ⬍
     </th>
 
-    <th className="p-2 cursor-pointer" onClick={() => handleSort("hours")}>
+    <th className="p-2 w-[80px] cursor-pointer" onClick={() => handleSort("hours")}>
       Hours ⬍
     </th>
 
-    <th className="p-2">Status</th>
+    <th className="p-2 w-[120px]">Status</th>
     <th className="p-2">Notes</th>
-    <th className="p-2">Actions</th>
+    <th className="p-2 w-[100px]">Actions</th>
   </tr>
 </thead>
 
