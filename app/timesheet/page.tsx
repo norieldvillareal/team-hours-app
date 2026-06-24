@@ -17,6 +17,17 @@ export default function TimesheetPage() {
   const isAdmin = user && user.email === "nvillareal@pingala.eu"
 const [allEntries, setAllEntries] = useState<any[]>([])
 
+const [modalOpen, setModalOpen] = useState(false)
+const [modalConfig, setModalConfig] = useState({
+  title: "",
+  message: "",
+  onConfirm: () => {},
+})
+
+const openModal = (title: string, message: string, onConfirm: () => void) => {
+  setModalConfig({ title, message, onConfirm })
+  setModalOpen(true)
+}
 
 
   // ✅ ADD ENTRY STATES
@@ -607,7 +618,13 @@ await supabase
 
     {/* ✅ SUBMIT BUTTON */}
     <button
-      onClick={() => setShowConfirm(true)}
+      onClick={() =>
+  openModal(
+    "Submit OT",
+    "This will submit and lock all your entries.",
+    async () => await handleSubmitTimesheet()
+  )
+}
       disabled={isSubmitted}
       className={`w-[180px] text-center px-4 py-2 rounded-lg text-white ${
         isSubmitted
@@ -782,11 +799,13 @@ await supabase
     </button>
 
     <button
-      onClick={() => {
-        if (
-          confirm(
-  `This will permanently delete ${entry.type} with ${entry.hours} hour(s) on ${entry.date}. Continue?`
-)
+onClick={() =>
+  openModal(
+    "Delete Entry",
+  `This will permanently delete ${entry.type} with ${entry.hours} hour(s) on ${entry.date}. Continue?`,
+    () => handleDelete(entry.id)
+  )
+}
         ) {
           handleDelete(entry.id)
         }
@@ -801,15 +820,13 @@ await supabase
 {/* ✅ ADMIN (OUTSIDE) */}
 {isAdmin && entry.status === "Submitted" && (
   <button
-    onClick={() => {
-      if (
-        confirm(
-          `Override this submitted entry and revert it to Draft?`
-        )
-      ) {
-        setEditingEntry(entry)
-      }
-    }}
+onClick={() =>
+  openModal(
+    "Override Entry",
+          `Override this submitted entry and revert it to Draft?`,
+    () => setEditingEntry(entry)
+  )
+}
     className="text-orange-500 text-xs"
   >
     Override
@@ -835,31 +852,45 @@ await supabase
 
         </div>
       </div>
+      
+{modalOpen && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
 
-      {/* ✅ SUBMIT MODAL */}
-      {showConfirm && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-xl">
-            <h2 className="mb-4">Confirm submission?</h2>
+    <div className="bg-white p-6 rounded-xl w-[320px] text-center shadow-lg animate-scale-in">
 
-            <div className="flex gap-2">
-              <button onClick={() => setShowConfirm(false)}>
-                Cancel
-              </button>
+      <h2 className="text-lg font-semibold mb-2">
+        {modalConfig.title}
+      </h2>
 
-              <button
-                onClick={async () => {
-                  await handleSubmitTimesheet()
-                  setShowConfirm(false)
-                }}
-              >
-                Confirm
-              </button>
-            </div>
+      <p className="text-sm text-gray-600 mb-4">
+        {modalConfig.message}
+      </p>
 
-          </div>
-        </div>
-      )}
+      <div className="flex justify-center gap-3">
+
+        <button
+          onClick={() => setModalOpen(false)}
+          className="px-4 py-2 rounded-lg bg-gray-300 text-black text-sm"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={async () => {
+            await modalConfig.onConfirm()
+            setModalOpen(false)
+          }}
+          className="px-4 py-2 rounded-lg bg-[#40948d] text-white text-sm"
+        >
+          Confirm
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+)}
 
       {/* ✅ EDIT MODAL */}
 {editingEntry && (
