@@ -93,7 +93,7 @@ export default function LoginPage() {
         />
 
         <h1 className="text-2xl font-semibold mb-2 text-gray-800">
-          Overtime Hours
+          Overtime App
         </h1>
 
         <p className="text-sm text-gray-600 mb-6">
@@ -105,7 +105,7 @@ export default function LoginPage() {
           ref={inputRef}
           type="text"
           autoComplete="off"
-          placeholder="yourname@pingala.eu"
+          placeholder="flastname@pingala.eu"
           className="w-full border border-gray-300 rounded-lg p-3 mb-1 text-black placeholder-gray-400 bg-white focus:outline-none focus:ring-2 focus:ring-[#40948d]"
           value={email}
           onChange={(e) => {
