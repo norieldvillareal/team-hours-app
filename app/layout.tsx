@@ -12,9 +12,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "Overtime App",
-  description: "Overtime filing and tracking system",
+  description: "Overtime tracking system",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
