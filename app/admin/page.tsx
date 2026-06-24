@@ -180,7 +180,7 @@ export default function AdminPage() {
 
             {/* Month */}
             <div>
-              <label className="block text-sm mb-1">Month</label>
+              <label className="block text-sm font-semibold mb-1">Month</label>
               <input
                 type="month"
                 value={selectedMonth}
@@ -191,7 +191,7 @@ export default function AdminPage() {
 
             {/* Type */}
             <div>
-              <label className="block text-sm mb-1">Type</label>
+              <label className="block text-sm font-semibold mb-1">Type</label>
               <select
                 value={selectedType}
                 onChange={(e) => setSelectedType(e.target.value)}
@@ -211,7 +211,7 @@ export default function AdminPage() {
 
             {/* ✅ NAME FILTER */}
             <div>
-              <label className="block text-sm mb-1">Name</label>
+              <label className="block text-sm font-semibold mb-1">Name</label>
               <select
                 value={selectedName}
                 onChange={(e) => setSelectedName(e.target.value)}
@@ -244,15 +244,17 @@ export default function AdminPage() {
         </Row>
       `).join("")
 
-      const rawRows = rawEntries.map(e => `
-        <Row>
-          <Cell><Data ss:Type="String">${e.date}</Data></Cell>
-          <Cell><Data ss:Type="String">${e.name}</Data></Cell>
-          <Cell><Data ss:Type="String">${e.type}</Data></Cell>
-          <Cell><Data ss:Type="String">${getCategory(e.type)}</Data></Cell>
-          <Cell><Data ss:Type="Number">${e.hours}</Data></Cell>
-        </Row>
-      `).join("")
+const rawRows = rawEntries.map(e => `
+  <Row>
+    <Cell><Data ss:Type="String">${e.date}</Data></Cell>
+    <Cell><Data ss:Type="String">${e.name}</Data></Cell>
+    <Cell><Data ss:Type="String">${e.type}</Data></Cell>
+    <Cell><Data ss:Type="String">${getCategory(e.type)}</Data></Cell>
+    <Cell><Data ss:Type="Number">${e.hours}</Data></Cell>
+    <Cell><Data ss:Type="String">${e.status || "Draft"}</Data></Cell>
+    <Cell><Data ss:Type="String">${e.notes || ""}</Data></Cell>
+  </Row>
+`).join("")
 
       const xml = `<?xml version="1.0"?>
         <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
@@ -278,13 +280,16 @@ export default function AdminPage() {
 
               <Row><Cell><Data ss:Type="String">RAW DATA</Data></Cell></Row>
 
-              <Row>
-                <Cell><Data ss:Type="String">Date</Data></Cell>
-                <Cell><Data ss:Type="String">Name</Data></Cell>
-                <Cell><Data ss:Type="String">Type</Data></Cell>
-                <Cell><Data ss:Type="String">Category</Data></Cell>
-                <Cell><Data ss:Type="String">Hours</Data></Cell>
-              </Row>
+<Row>
+  <Cell><Data ss:Type="String">Date</Data></Cell>
+  <Cell><Data ss:Type="String">Name</Data></Cell>
+  <Cell><Data ss:Type="String">Type</Data></Cell>
+  <Cell><Data ss:Type="String">Category</Data></Cell>
+  <Cell><Data ss:Type="String">Hours</Data></Cell>
+  <Cell><Data ss:Type="String">Status</Data></Cell>
+  <Cell><Data ss:Type="String">Notes</Data></Cell>
+</Row>
+
 
               ${rawRows}
 
