@@ -429,7 +429,7 @@ setEntries(sortEntries(filtered))
           <div className="mb-4 grid grid-cols-3 gap-3">
 
             <div>
-              <label className="block text-sm mb-1">Month</label>
+              <label className="block text-sm font-semibold mb-1">Month</label>
               <input
                 type="month"
                 value={selectedMonth}
@@ -439,7 +439,7 @@ setEntries(sortEntries(filtered))
             </div>
 
             <div>
-              <label className="block text-sm mb-1">Type</label>
+              <label className="block text-sm font-semibold mb-1">Type</label>
               <select
                 value={selectedType}
                 onChange={(e) => setSelectedType(e.target.value)}
@@ -457,7 +457,7 @@ setEntries(sortEntries(filtered))
               </select>
             </div>
 <div>
-  <label className="block text-sm mb-1">Category</label>
+  <label className="block text-sm font-semibold mb-1">Category</label>
   <select
     value={selectedCategory}
     onChange={(e) => setSelectedCategory(e.target.value)}
