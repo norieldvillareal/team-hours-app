@@ -850,9 +850,9 @@ onClick={() =>
       </div>
 
 {modalOpen && (
-  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+  <div className="fixed inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm z-50">
 
-    <div className="bg-white p-6 rounded-xl w-[320px] text-center shadow-lg animate-scale-in">
+    <div className="bg-white p-6 rounded-xl w-[320px] text-center shadow-2xl animate-scale-in">
 
       <h2 className="text-lg font-semibold mb-2">
         {modalConfig.title}
