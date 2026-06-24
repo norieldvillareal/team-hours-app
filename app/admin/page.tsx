@@ -159,6 +159,7 @@ export default function AdminPage() {
   const totalNight = entries.reduce((sum, e) => sum + e.night, 0)
   const totalWeekend = entries.reduce((sum, e) => sum + e.weekend, 0)
   const totalHoliday = entries.reduce((sum, e) => sum + e.holiday, 0)
+  const totalHours = totalWeekday + totalNight + totalWeekend + totalHoliday
 
   return (
     <div className="min-h-screen bg-[#c6dbdc] text-black">
@@ -227,6 +228,36 @@ export default function AdminPage() {
             </div>
 
           </div>
+
+{/* ✅ TOTALS BY CATEGORY (LIKE TIMESHEET) */}
+<div className="mb-3">
+
+  <table className="w-full text-xs border rounded-lg overflow-hidden">
+    
+    <thead className="bg-[#be95be] text-black">
+      <tr>
+        <th className="p-2 text-center">Weekday</th>
+        <th className="p-2 text-center">Night</th>
+        <th className="p-2 text-center">Weekend</th>
+        <th className="p-2 text-center">Holiday</th>
+        <th className="p-2 text-center font-bold">Total OT</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr className="text-center font-semibold">
+        <td className="p-2">{totalWeekday}</td>
+        <td className="p-2">{totalNight}</td>
+        <td className="p-2">{totalWeekend}</td>
+        <td className="p-2">{totalHoliday}</td>
+        <td className="p-2 font-bold">{totalHours}</td>
+      </tr>
+    </tbody>
+
+  </table>
+
+</div>
+
 
 {/* ✅ EXPORT FULL */}
 <div className="mb-4 flex justify-end">
