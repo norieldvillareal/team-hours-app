@@ -347,16 +347,16 @@ const rawRows = rawEntries.map(e => `
 
 
           {/* ✅ TABLE */}
-          <table className="w-full text-xs border">
+          <table className="w-full text-xs border table-fixed">
             <thead className="bg-gray-100">
               <tr>
-<th className="p-2">Month</th>
-<th className="p-2">Name</th>
-<th className="p-2 text-right cursor-pointer">Weekday OT ⬍</th>
-<th className="p-2 text-right cursor-pointer">Night OT ⬍</th>
-<th className="p-2 text-right cursor-pointer">Weekend OT ⬍</th>
-<th className="p-2 text-right cursor-pointer">Holiday OT ⬍</th>
-<th className="p-2 text-right font-bold text-[#40948d]">Total OT</th>
+<th className="p-2 w-[100px]">Month</th>
+<th className="p-2 w-[180px]">Name</th>
+<th className="p-2 w-[90px] text-right">Weekday</th>
+<th className="p-2 w-[90px] text-right">Night</th>
+<th className="p-2 w-[90px] text-right">Weekend</th>
+<th className="p-2 w-[90px] text-right">Holiday</th>
+<th className="p-2 w-[100px] text-right font-bold text-[#40948d]">Total</th>
               </tr>
             </thead>
 
@@ -364,7 +364,7 @@ const rawRows = rawEntries.map(e => `
               {entries.map((entry, index) => (
                 <tr key={index} className="border-t">
                   <td className="p-2">{selectedMonth || "All"}</td>
-                  <td className="p-2 text-right">{entry.name}</td>
+                  <td className="p-2">{entry.name}</td>
 <td className="p-2 text-right">{entry.weekday}</td>
 <td className="p-2 text-right">{entry.night}</td>
 <td className="p-2 text-right">{entry.weekend}</td>
