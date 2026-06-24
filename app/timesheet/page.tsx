@@ -12,12 +12,20 @@ export default function TimesheetPage() {
   const [entries, setEntries] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
+  
   // ✅ ADD ENTRY STATES
 const [date, setDate] = useState("")
 const [hours, setHours] = useState("")
 const [type, setType] = useState("")
 const [notes, setNotes] = useState("")
 const [selectedCategory, setSelectedCategory] = useState("All")
+const isAddDisabled =
+  !date ||
+  !type ||
+  !hours ||
+  Number(hours) <= 0 ||
+  Number(hours) >= 24
+
 
 
   const getCategory = (type: string) => {
@@ -28,6 +36,16 @@ const [selectedCategory, setSelectedCategory] = useState("All")
   if (type.includes("Holiday")) return "Holiday OT"
 
   return "Weekday OT"
+}
+
+const handleKeyDown = (e: React.KeyboardEvent) => {
+  if (e.key === "Enter") {
+    e.preventDefault()
+
+    if (!isAddDisabled) {
+      handleAddEntry()
+    }
+  }
 }
 
 
@@ -328,18 +346,27 @@ setEntries(sortEntries(filtered))
           </p>
 
 {/* ✅ ADD ENTRY FORM (ONE LINE) */}
-<div className="mb-6 grid grid-cols-5 gap-2 items-center">
+{/* ✅ ADD ENTRY FORM (ONE LINE + ENTER SUPPORT) */}
+<form
+  onSubmit={(e) => {
+    e.preventDefault()
+    if (!isAddDisabled) handleAddEntry()
+  }}
+  className="mb-6 grid grid-cols-5 gap-2 items-center"
+>
 
   <input
     type="date"
     value={date}
     onChange={(e) => setDate(e.target.value)}
+    onKeyDown={handleKeyDown}
     className="border rounded-lg p-2"
   />
 
   <select
     value={type}
     onChange={(e) => setType(e.target.value)}
+    onKeyDown={handleKeyDown}
     className="border rounded-lg p-2"
   >
     <option value="">Type</option>
@@ -358,6 +385,7 @@ setEntries(sortEntries(filtered))
     placeholder="Hours"
     value={hours}
     onChange={(e) => setHours(e.target.value)}
+    onKeyDown={handleKeyDown}
     className="border rounded-lg p-2"
   />
 
@@ -365,17 +393,24 @@ setEntries(sortEntries(filtered))
     placeholder="Notes"
     value={notes}
     onChange={(e) => setNotes(e.target.value)}
+    onKeyDown={handleKeyDown}
     className="border rounded-lg p-2"
   />
 
   <button
-    onClick={handleAddEntry}
-    className="bg-[#40948d] text-white rounded-lg h-full"
+    type="submit"
+    disabled={isAddDisabled}
+    className={`rounded-lg h-full text-white ${
+      isAddDisabled
+        ? "bg-gray-400 cursor-not-allowed"
+        : "bg-[#40948d] hover:opacity-90"
+    }`}
   >
     Add
   </button>
 
-</div>
+</form>
+
 
           {/* ✅ FILTERS */}
           <div className="mb-4 grid grid-cols-3 gap-3">
