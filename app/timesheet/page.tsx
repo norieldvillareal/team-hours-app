@@ -341,9 +341,9 @@ setEntries(sortEntries(filtered))
             My Overtime
           </h1>
 
-          <p className="text-sm mb-4 text-gray-600">
+          {/*<p className="text-sm mb-4 text-gray-600">
             Logged in as: {allowedUsers[user.email]}
-          </p>
+          </p>*/}
 
 {/* ✅ ADD ENTRY FORM (ONE LINE) */}
 {/* ✅ ADD ENTRY FORM (ONE LINE + ENTER SUPPORT) */}
@@ -465,7 +465,7 @@ setEntries(sortEntries(filtered))
 {/* HEADER */}
 <div className="mb-4 flex justify-between items-center">
   <div className="text-lg">
-    Total Hours: <strong>{totalHours}</strong>
+    My OT for this month: <strong>{totalHours}</strong>
   </div>
 
   {/* ✅ BUTTON GROUP */}
