@@ -440,7 +440,8 @@ setEntries(sortEntries(filtered))
 
 
           {/* ✅ FILTERS */}
-          <div className="mb-4 grid grid-cols-3 gap-3">
+          <div className="mb-4 grid grid-cols-1 md:grid-cols-4 gap-3">
+
 
             <div>
               <label className="block text-sm font-semibold mb-1">Month</label>
