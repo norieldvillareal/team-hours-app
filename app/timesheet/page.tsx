@@ -626,9 +626,11 @@ await supabase
         const rows = entries.map(e => `
           <Row>
             <Cell><Data ss:Type="String">${e.date}</Data></Cell>
+            <Cell><Data ss:Type="String">${e.name}</Data></Cell>
             <Cell><Data ss:Type="String">${e.type}</Data></Cell>
             <Cell><Data ss:Type="String">${getCategory(e.type)}</Data></Cell>
             <Cell><Data ss:Type="Number">${e.hours}</Data></Cell>
+            <Cell><Data ss:Type="String">${e.status || "Draft"}</Data></Cell>
             <Cell><Data ss:Type="String">${e.notes || ""}</Data></Cell>
           </Row>
         `).join("")
@@ -640,11 +642,13 @@ await supabase
               <Table>
 
                 <Row>
-                  <Cell><Data ss:Type="String">Date</Data></Cell>
-                  <Cell><Data ss:Type="String">Type</Data></Cell>
-                  <Cell><Data ss:Type="String">Category</Data></Cell>
-                  <Cell><Data ss:Type="String">Hours</Data></Cell>
-                  <Cell><Data ss:Type="String">Notes</Data></Cell>
+  <Cell><Data ss:Type="String">Date</Data></Cell>
+  <Cell><Data ss:Type="String">Name</Data></Cell>
+  <Cell><Data ss:Type="String">Type</Data></Cell>
+  <Cell><Data ss:Type="String">Category</Data></Cell>
+  <Cell><Data ss:Type="String">Hours</Data></Cell>
+  <Cell><Data ss:Type="String">Status</Data></Cell>
+  <Cell><Data ss:Type="String">Notes</Data></Cell>
                 </Row>
 
                 ${rows}
