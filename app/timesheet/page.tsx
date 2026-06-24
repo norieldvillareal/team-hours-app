@@ -577,7 +577,18 @@ setEntries(sortEntries(filtered))
                   <td className="p-2">{entry.type}</td>
                   <td className="p-2">{getCategory(entry.type)}</td>
                   <td className="p-2">{entry.hours}</td>
-                  <td className="p-2">{entry.status || "Draft"}</td>
+                  <td className="p-2">
+  <span
+    className={`px-3 py-1 text-xs font-semibold rounded-full ${
+      entry.status === "Submitted"
+        ? "bg-green-200 text-green-800"
+        : "bg-[#be95be] text-black"
+    }`}
+  >
+    {entry.status || "Draft"}
+  </span>
+</td>
+
                   <td className="p-2">{entry.notes}</td>
 
                   <td className="p-2">
