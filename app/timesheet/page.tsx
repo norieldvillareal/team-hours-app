@@ -13,6 +13,8 @@ export default function TimesheetPage() {
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
   
+  const isAdmin = user?.email === "nvillareal@pingala.eu"
+
   // ✅ ADD ENTRY STATES
 const [date, setDate] = useState("")
 const [hours, setHours] = useState("")
@@ -634,23 +636,39 @@ setEntries(sortEntries(filtered))
                   <td className="p-2">{entry.notes}</td>
 
                   <td className="p-2">
-                    {entry.status !== "Submitted" && (
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => setEditingEntry(entry)}
-                          className="text-blue-500 text-xs"
-                        >
-                          Edit
-                        </button>
+                    <div className="flex gap-2">
 
-                        <button
-                          onClick={() => handleDelete(entry.id)}
-                          className="text-red-500 text-xs"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    )}
+  {/* ✅ Normal Edit/Delete (Draft only) */}
+  {entry.status !== "Submitted" && (
+    <>
+      <button
+        onClick={() => setEditingEntry(entry)}
+        className="text-blue-500 text-xs"
+      >
+        Edit
+      </button>
+
+      <button
+        onClick={() => handleDelete(entry.id)}
+        className="text-red-500 text-xs"
+      >
+        Delete
+      </button>
+    </>
+  )}
+
+  {/* ✅ ADMIN OVERRIDE */}
+  {entry.status === "Submitted" && isAdmin && (
+    <button
+      onClick={() => setEditingEntry(entry)}
+      className="text-orange-500 text-xs"
+    >
+      Override
+    </button>
+  )}
+
+</div>
+
                   </td>
                 </tr>
               ))}
