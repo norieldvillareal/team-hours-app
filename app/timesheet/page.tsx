@@ -789,9 +789,7 @@ await supabase
 
 
           {/* ADMIN */}
-{isAdmin &&
-  entry.name !== currentUserName &&
-  entry.status === "Submitted" && (
+{isAdmin && entry.status === "Submitted" && (
     <button
       onClick={() => setEditingEntry(entry)}
       className="text-orange-500 text-xs"
