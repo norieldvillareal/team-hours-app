@@ -476,23 +476,23 @@ setEntries(sortEntries(filtered))
 
 
 {/* HEADER */}
-<div className="mb-4 flex justify-between items-center">
+<div className="mb-4">
   {/* <div className="text-lg">
     Total hours for the month: <strong>{totalHours}</strong>
   </div>*/}
 
 {/* ✅ TOTALS BY CATEGORY (TABLE STYLE) */}
-<div className="mb-4">
+<div className="mb-3">
 
   <table className="w-full text-sm border rounded-lg overflow-hidden">
     
     <thead className="bg-[#6dbfb8] text-black">
       <tr>
-        <th className="p-2 text-center">Weekday OT</th>
-        <th className="p-2 text-center">Night OT</th>
-        <th className="p-2 text-center">Weekend OT</th>
-        <th className="p-2 text-center">Holiday OT</th>
-        <th className="p-2 text-center font-bold">Total</th>
+        <th className="p-2 text-center">Weekday</th>
+        <th className="p-2 text-center">Night</th>
+        <th className="p-2 text-center">Weekend</th>
+        <th className="p-2 text-center">Holiday</th>
+        <th className="p-2 text-center font-bold">Total OT</th>
       </tr>
     </thead>
 
@@ -511,7 +511,7 @@ setEntries(sortEntries(filtered))
 </div>
 
   {/* ✅ BUTTON GROUP */}
-  <div className="flex gap-2">
+  <div className="flex justify-end gap-2 mt-2">
 
     {/* ✅ SUBMIT BUTTON */}
     <button
