@@ -348,15 +348,15 @@ const rawRows = rawEntries.map(e => `
 
           {/* ✅ TABLE */}
           <table className="w-full text-xs border">
-            <thead className="bg-gray-100 text-left">
+            <thead className="bg-gray-100">
               <tr>
-                <th className="p-2">Month</th>
-                <th className="p-2">Name</th>
-                <th className="p-2 cursor-pointer" onClick={() => handleSort("weekday")}>Weekday OT ⬍</th>
-                <th className="p-2 cursor-pointer" onClick={() => handleSort("night")}>Night OT ⬍</th>
-                <th className="p-2 cursor-pointer" onClick={() => handleSort("weekend")}>Weekend OT ⬍</th>
-                <th className="p-2 cursor-pointer" onClick={() => handleSort("holiday")}>Holiday OT ⬍</th>
-                <th className="p-2 font-bold text-[#40948d] cursor-pointer">Total OT</th>
+<th className="p-2">Month</th>
+<th className="p-2">Name</th>
+<th className="p-2 text-right cursor-pointer">Weekday OT ⬍</th>
+<th className="p-2 text-right cursor-pointer">Night OT ⬍</th>
+<th className="p-2 text-right cursor-pointer">Weekend OT ⬍</th>
+<th className="p-2 text-right cursor-pointer">Holiday OT ⬍</th>
+<th className="p-2 text-right font-bold text-[#40948d]">Total OT</th>
               </tr>
             </thead>
 
@@ -364,12 +364,12 @@ const rawRows = rawEntries.map(e => `
               {entries.map((entry, index) => (
                 <tr key={index} className="border-t">
                   <td className="p-2">{selectedMonth || "All"}</td>
-                  <td className="p-2">{entry.name}</td>
-                  <td className="p-2">{entry.weekday}</td>
-                  <td className="p-2">{entry.night}</td>
-                  <td className="p-2">{entry.weekend}</td>
-                  <td className="p-2">{entry.holiday}</td>
-                  <td className="p-2 font-semibold">
+                  <td className="p-2 text-right">{entry.name}</td>
+<td className="p-2 text-right">{entry.weekday}</td>
+<td className="p-2 text-right">{entry.night}</td>
+<td className="p-2 text-right">{entry.weekend}</td>
+<td className="p-2 text-right">{entry.holiday}</td>
+<td className="p-2 text-right font-semibold">
                     {entry.weekday + entry.night + entry.weekend + entry.holiday}
                   </td>
                 </tr>
