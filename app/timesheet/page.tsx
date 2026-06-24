@@ -13,7 +13,10 @@ export default function TimesheetPage() {
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
   
+  const [selectedName, setSelectedName] = useState("All")
   const isAdmin = user?.email === "nvillareal@pingala.eu"
+
+
 
   // ✅ ADD ENTRY STATES
 const [date, setDate] = useState("")
@@ -156,7 +159,12 @@ const handleKeyDown = (e: React.KeyboardEvent) => {
 let query = supabase
   .from("time_entries")
   .select("*")
-  .eq("name", userName)
+  if (!isAdmin) {
+  query = query.eq("name", userName)
+} else if (selectedName !== "All") {
+  query = query.eq("name", selectedName)
+}
+
 
 
 // ✅ ONLY apply date filter if month is selected
@@ -261,6 +269,7 @@ setEntries(sortEntries(filtered))
         date: editingEntry.date,
         hours: editingEntry.hours,
         notes: editingEntry.notes,
+        status: "Draft", // ✅ add this
       })
       .eq("id", editingEntry.id)
 
@@ -473,6 +482,23 @@ setEntries(sortEntries(filtered))
   </select>
 </div>
 
+{isAdmin && (
+  <div>
+    <label className="block text-sm font-semibold mb-1">Name</label>
+    <select
+      value={selectedName}
+      onChange={(e) => setSelectedName(e.target.value)}
+      className="w-full border rounded-lg p-2"
+    >
+      <option value="All">All</option>
+      {[...new Set(entries.map(e => e.name))].map((name) => (
+        <option key={name} value={name}>
+          {name}
+        </option>
+      ))}
+    </select>
+  </div>
+)}
 
           </div>
 
@@ -638,34 +664,44 @@ setEntries(sortEntries(filtered))
                   <td className="p-2">
                     <div className="flex gap-2">
 
-  {/* ✅ Normal Edit/Delete (Draft only) */}
-  {entry.status !== "Submitted" && (
-    <>
+  <td className="p-2">
+  <div className="flex gap-2">
+
+<td className="p-2">
+  <div className="flex gap-2">
+
+    {/* ✅ NORMAL USER ACTIONS */}
+    {entry.status !== "Submitted" && (
+      <>
+        <button
+          onClick={() => setEditingEntry(entry)}
+          className="text-blue-500 text-xs"
+        >
+          Edit
+        </button>
+
+        <button
+          onClick={() => handleDelete(entry.id)}
+          className="text-red-500 text-xs"
+        >
+          Delete
+        </button>
+      </>
+    )}
+
+    {/* ✅ ADMIN OVERRIDE */}
+    {entry.status === "Submitted" && isAdmin && selectedName !== "All" && (
       <button
         onClick={() => setEditingEntry(entry)}
-        className="text-blue-500 text-xs"
+        className="text-orange-500 text-xs"
       >
-        Edit
+        Override
       </button>
+    )}
 
-      <button
-        onClick={() => handleDelete(entry.id)}
-        className="text-red-500 text-xs"
-      >
-        Delete
-      </button>
-    </>
-  )}
+  </div>
+</td>
 
-  {/* ✅ ADMIN OVERRIDE */}
-  {entry.status === "Submitted" && isAdmin && (
-    <button
-      onClick={() => setEditingEntry(entry)}
-      className="text-orange-500 text-xs"
-    >
-      Override
-    </button>
-  )}
 
 </div>
 
