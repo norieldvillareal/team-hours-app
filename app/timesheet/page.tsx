@@ -647,12 +647,19 @@ setEntries(sortEntries(filtered))
   {entries.map((entry) => (
     <tr key={entry.id} className="border-t">
 
+      {/* DATE */}
       <td className="p-2">{entry.date}</td>
+
+      {/* TYPE */}
       <td className="p-2">{entry.type}</td>
+
+      {/* CATEGORY */}
       <td className="p-2">{getCategory(entry.type)}</td>
+
+      {/* HOURS */}
       <td className="p-2">{entry.hours}</td>
 
-      {/* ✅ STATUS */}
+      {/* STATUS */}
       <td className="p-2">
         <span
           className={`px-3 py-1 text-xs font-semibold rounded-full ${
@@ -665,10 +672,10 @@ setEntries(sortEntries(filtered))
         </span>
       </td>
 
-      {/* ✅ NOTES */}
+      {/* NOTES */}
       <td className="p-2">{entry.notes}</td>
 
-      {/* ✅ ACTIONS */}
+      {/* ACTIONS */}
       <td className="p-2">
         <div className="flex gap-2">
 
@@ -707,6 +714,7 @@ setEntries(sortEntries(filtered))
     </tr>
   ))}
 </tbody>
+
 
           </table>
 
