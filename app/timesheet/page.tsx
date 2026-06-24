@@ -168,12 +168,12 @@ let query = supabase
   .from("time_entries")
   .select("*")
 
-// ✅ NORMAL USER → only own data
+// ✅ NORMAL USER → only own entries
 if (!isAdmin) {
   query = query.eq("name", userName)
 }
 
-// ✅ ADMIN → filter only if specific name selected
+// ✅ ADMIN → filter ONLY when specific name selected
 if (isAdmin && selectedName !== "All") {
   query = query.eq("name", selectedName)
 }
