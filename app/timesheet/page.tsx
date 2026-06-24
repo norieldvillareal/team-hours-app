@@ -134,7 +134,7 @@ const handleKeyDown = (e: React.KeyboardEvent) => {
     }
 
     getUser()
-  }, [selectedMonth, selectedType, selectedCategory])
+  }, [selectedMonth, selectedType, selectedCategory, selectedName])
 
 
   useEffect(() => {
