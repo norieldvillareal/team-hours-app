@@ -480,7 +480,33 @@ setEntries(sortEntries(filtered))
   <div className="text-lg">
     Total hours for the month: <strong>{totalHours}</strong>
   </div>
+  
+{/* ✅ TOTALS BY CATEGORY (TABLE STYLE) */}
+<div className="mt-4">
 
+  <table className="w-full text-sm border rounded-lg overflow-hidden">
+    
+    <thead className="bg-[#6dbfb8] text-black">
+      <tr>
+        <th className="p-2 text-center">Weekday OT</th>
+        <th className="p-2 text-center">Night OT</th>
+        <th className="p-2 text-center">Weekend OT</th>
+        <th className="p-2 text-center">Holiday OT</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr className="text-center font-semibold">
+        <td className="p-2">{totalsByCategory["Weekday OT"] || 0}</td>
+        <td className="p-2">{totalsByCategory["Night OT"] || 0}</td>
+        <td className="p-2">{totalsByCategory["Weekend OT"] || 0}</td>
+        <td className="p-2">{totalsByCategory["Holiday OT"] || 0}</td>
+      </tr>
+    </tbody>
+
+  </table>
+
+</div>
   {/* ✅ BUTTON GROUP */}
   <div className="flex gap-2">
 
@@ -550,32 +576,7 @@ setEntries(sortEntries(filtered))
   </div>
 </div>
 
-{/* ✅ TOTALS BY CATEGORY (TABLE STYLE) */}
-<div className="mt-4">
 
-  <table className="w-full text-sm border rounded-lg overflow-hidden">
-    
-    <thead className="bg-[#6dbfb8] text-black">
-      <tr>
-        <th className="p-2 text-center">Weekday OT</th>
-        <th className="p-2 text-center">Night OT</th>
-        <th className="p-2 text-center">Weekend OT</th>
-        <th className="p-2 text-center">Holiday OT</th>
-      </tr>
-    </thead>
-
-    <tbody>
-      <tr className="text-center font-semibold">
-        <td className="p-2">{totalsByCategory["Weekday OT"] || 0}</td>
-        <td className="p-2">{totalsByCategory["Night OT"] || 0}</td>
-        <td className="p-2">{totalsByCategory["Weekend OT"] || 0}</td>
-        <td className="p-2">{totalsByCategory["Holiday OT"] || 0}</td>
-      </tr>
-    </tbody>
-
-  </table>
-
-</div>
 
           {/* TABLE */}
           <table className="w-full text-sm border">
