@@ -632,7 +632,7 @@ await supabase
           : "bg-[#40948d] hover:opacity-90"
       }`}
     >
-      {isSubmitted ? "Already Submitted" : "Submit OT Hours"}
+      {isSubmitted ? "Already Submitted" : "Submit OT"}
     </button>
 
     {/* ✅ EXPORT BUTTON */}

@@ -57,7 +57,7 @@ export default function Navbar() {
       <div className="max-w-4xl mx-auto flex justify-between items-center px-6 py-3">
 
         <div className="font-semibold text-lg">
-          Overtime Hours
+          Overtime App
         </div>
 
         <div className="flex items-center gap-4">
@@ -95,7 +95,7 @@ export default function Navbar() {
         </Link>
 
         <Link href="/admin" className={linkClass("/admin")}>
-          Admin
+          Report
         </Link>
 
       </div>
