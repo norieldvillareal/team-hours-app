@@ -674,32 +674,32 @@ await supabase
 
 <thead className="bg-gray-100 text-left">
   <tr>
-    <th className="p-2 w-[120px] cursor-pointer" onClick={() => handleSort("date")}>
+    <th className="p-2 w-[100px] cursor-pointer" onClick={() => handleSort("date")}>
       Date ⬍
     </th>
 
-    <th className="p-2 w-[160px] cursor-pointer" onClick={() => handleSort("type")}>
+    <th className="p-2 w-[150px] cursor-pointer" onClick={() => handleSort("type")}>
       Name ⬍
     </th>
 
-    <th className="p-2 w-[140px] cursor-pointer" onClick={() => handleSort("type")}>
+    <th className="p-2 w-[120px] cursor-pointer" onClick={() => handleSort("type")}>
       Type ⬍
     </th>
 
     <th
-      className="p-2  w-[140px] cursor-pointer"
+      className="p-2  w-[120px] cursor-pointer"
       onClick={() => handleSort("type")}
     >
       Category ⬍
     </th>
 
-    <th className="p-2 w-[80px] cursor-pointer" onClick={() => handleSort("hours")}>
+    <th className="p-2 w-[70px] cursor-pointer" onClick={() => handleSort("hours")}>
       Hours ⬍
     </th>
 
-    <th className="p-2 w-[120px]">Status</th>
+    <th className="p-2 w-[110px]">Status</th>
     <th className="p-2">Notes</th>
-    <th className="p-2 w-[100px]">Actions</th>
+    <th className="p-2 w-[90px]">Actions</th>
   </tr>
 </thead>
 
@@ -753,7 +753,9 @@ await supabase
       </td>
 
       {/* NOTES */}
-      <td className="p-2">{entry.notes}</td>
+      <td className="p-2 break-words">
+  {entry.notes}
+</td>
 
       {/* ✅ ACTIONS */}
       <td className="p-2">
