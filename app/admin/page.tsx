@@ -181,7 +181,7 @@ export default function AdminPage() {
 
             {/* Month */}
             <div>
-              <label className="block text-sm font-semibold mb-1">Month</label>
+              <label className="block text-xs font-semibold mb-1">Month</label>
               <input
                 type="month"
                 value={selectedMonth}
@@ -192,7 +192,7 @@ export default function AdminPage() {
 
             {/* Type */}
             <div>
-              <label className="block text-sm font-semibold mb-1">Type</label>
+              <label className="block text-xs font-semibold mb-1">Type</label>
               <select
                 value={selectedType}
                 onChange={(e) => setSelectedType(e.target.value)}
@@ -212,7 +212,7 @@ export default function AdminPage() {
 
             {/* ✅ NAME FILTER */}
             <div>
-              <label className="block text-sm font-semibold mb-1">Name</label>
+              <label className="block text-xs font-semibold mb-1">Name</label>
               <select
                 value={selectedName}
                 onChange={(e) => setSelectedName(e.target.value)}
@@ -347,7 +347,7 @@ const rawRows = rawEntries.map(e => `
 
 
           {/* ✅ TABLE */}
-          <table className="w-full text-sm border">
+          <table className="w-full text-xs border">
             <thead className="bg-gray-100 text-left">
               <tr>
                 <th className="p-2">Month</th>
@@ -356,6 +356,7 @@ const rawRows = rawEntries.map(e => `
                 <th className="p-2 cursor-pointer" onClick={() => handleSort("night")}>Night OT ⬍</th>
                 <th className="p-2 cursor-pointer" onClick={() => handleSort("weekend")}>Weekend OT ⬍</th>
                 <th className="p-2 cursor-pointer" onClick={() => handleSort("holiday")}>Holiday OT ⬍</th>
+                <th className="p-2 font-bold text-[#40948d] cursor-pointer">Total OT</th>
               </tr>
             </thead>
 
@@ -368,6 +369,9 @@ const rawRows = rawEntries.map(e => `
                   <td className="p-2">{entry.night}</td>
                   <td className="p-2">{entry.weekend}</td>
                   <td className="p-2">{entry.holiday}</td>
+                  <td className="p-2 font-semibold">
+                    {entry.weekday + entry.night + entry.weekend + entry.holiday}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -380,6 +384,7 @@ const rawRows = rawEntries.map(e => `
                 <td>{totalNight}</td>
                 <td>{totalWeekend}</td>
                 <td>{totalHoliday}</td>
+                <td>{totalHours}</td>
               </tr>
             </tfoot>
 
