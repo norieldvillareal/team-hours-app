@@ -141,7 +141,7 @@ useEffect(() => {
     }
 
     getUser()
-  }, [selectedMonth, selectedType, selectedCategory, selectedName])
+  }, [])
 
 useEffect(() => {
   if (user) {
@@ -177,6 +177,24 @@ let query = supabase
 let allQuery = supabase
   .from("time_entries")
   .select("*")
+
+// ✅ apply same filters (except name)
+if (selectedMonth) {
+  const startDate = `${selectedMonth}-01`
+  const lastDay = new Date(
+    new Date(selectedMonth + "-01").getFullYear(),
+    new Date(selectedMonth + "-01").getMonth() + 1,
+    0
+  ).getDate()
+  const endDate = `${selectedMonth}-${lastDay}`
+
+  allQuery = allQuery.gte("date", startDate).lte("date", endDate)
+}
+
+if (selectedType !== "All") {
+  allQuery = allQuery.eq("type", selectedType)
+}
+
 
 // ✅ NORMAL USER
 if (!isAdmin) {
