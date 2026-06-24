@@ -377,9 +377,9 @@ const rawRows = rawEntries.map(e => `
             </tbody>
 
             <tfoot>
-              <tr className="font-semibold bg-gray-100 border-t">
+              <tr className="font-bold bg-gray-200 border-t text-right">
                 <td></td>
-                <td>TOTAL</td>
+                <td className="text-left">TOTAL</td>
                 <td>{totalWeekday}</td>
                 <td>{totalNight}</td>
                 <td>{totalWeekend}</td>
