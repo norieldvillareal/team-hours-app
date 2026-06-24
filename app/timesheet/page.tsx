@@ -675,6 +675,10 @@ await supabase
       Date ⬍
     </th>
 
+    <th className="p-2 w-[250px] cursor-pointer" onClick={() => handleSort("type")}>
+      Name ⬍
+    </th>
+
     <th className="p-2 w-[140px] cursor-pointer" onClick={() => handleSort("type")}>
       Type ⬍
     </th>
@@ -704,6 +708,14 @@ await supabase
 
       {/* DATE */}
       <td className="p-2">{entry.date}</td>
+
+      {/* NAME */}
+<td className="p-2">
+  {entry.name}
+  {entry.name === allowedUsers[user?.email] && (
+    <span className="text-xs text-gray-500 ml-1">(You)</span>
+  )}
+</td>
 
       {/* TYPE */}
       <td className="p-2">{entry.type}</td>
