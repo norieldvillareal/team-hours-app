@@ -12,13 +12,18 @@ export default function TimesheetPage() {
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
 
+  const [sortColumn, setSortColumn] = useState("date")
+  const [sortDirection, setSortDirection] = useState("asc")
+
   const [selectedMonth, setSelectedMonth] = useState(
     new Date().toISOString().slice(0, 7)
   )
   const [selectedType, setSelectedType] = useState("All")
-  const [selectedCategory, setSelectedCategory] = useState("All") // ✅ NEW
+  const [selectedCategory, setSelectedCategory] = useState("All")
 
   const [message, setMessage] = useState("")
+  const [showConfirm, setShowConfirm] = useState(false)
+  const [editingEntry, setEditingEntry] = useState<any>(null)
 
   // ✅ ADD ENTRY STATES
   const [date, setDate] = useState("")
@@ -39,6 +44,33 @@ export default function TimesheetPage() {
     return "Weekday OT"
   }
 
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc")
+    } else {
+      setSortColumn(column)
+      setSortDirection("asc")
+    }
+  }
+
+  const sortEntries = (data: any[]) => {
+    if (!sortColumn) return data
+
+    return [...data].sort((a, b) => {
+      let valA = a[sortColumn]
+      let valB = b[sortColumn]
+
+      if (sortColumn === "hours") {
+        valA = Number(valA)
+        valB = Number(valB)
+      }
+
+      if (valA < valB) return sortDirection === "asc" ? -1 : 1
+      if (valA > valB) return sortDirection === "asc" ? 1 : -1
+      return 0
+    })
+  }
+
   useEffect(() => {
     const getUser = async () => {
       const { data } = await supabase.auth.getUser()
@@ -54,7 +86,7 @@ export default function TimesheetPage() {
     }
 
     getUser()
-  }, [selectedMonth, selectedType, selectedCategory]) // ✅ UPDATED
+  }, [selectedMonth, selectedType, selectedCategory])
 
   const fetchEntries = async (email: string) => {
     setLoading(true)
@@ -86,32 +118,19 @@ export default function TimesheetPage() {
 
     let filtered = data || []
 
-    // ✅ CATEGORY FILTER
     if (selectedCategory !== "All") {
       filtered = filtered.filter(
         (e) => getCategory(e.type) === selectedCategory
       )
     }
 
-    setEntries(filtered)
+    setEntries(sortEntries(filtered))
     setLoading(false)
   }
 
-  // ✅ ADD ENTRY WITH DUPLICATE CHECK
+  // ✅ ADD ENTRY (WITH DUPLICATE)
   const handleAddEntry = async () => {
-    setMessage("")
-
     const userName = allowedUsers[user.email]
-
-    if (!date || !hours || !type) {
-      setMessage("Please fill all required fields.")
-      return
-    }
-
-    if (Number(hours) > 24) {
-      setMessage("Hours cannot exceed 24.")
-      return
-    }
 
     const { data: existing } = await supabase
       .from("time_entries")
@@ -125,24 +144,9 @@ export default function TimesheetPage() {
       return
     }
 
-    const { error } = await supabase.from("time_entries").insert([
-      {
-        name: userName,
-        date,
-        hours: Number(hours),
-        type,
-        notes,
-      },
+    await supabase.from("time_entries").insert([
+      { name: userName, date, hours: Number(hours), type, notes },
     ])
-
-    if (error) {
-      if (error.code === "23505") {
-        setMessage("❌ Duplicate entry (DB).")
-      } else {
-        setMessage("❌ Failed to save.")
-      }
-      return
-    }
 
     setMessage("✅ Entry added")
 
@@ -154,108 +158,95 @@ export default function TimesheetPage() {
     fetchEntries(user.email)
   }
 
+  const handleDelete = async (id: number) => {
+    await supabase.from("time_entries").delete().eq("id", id)
+    fetchEntries(user.email)
+  }
+
+  const handleUpdate = async () => {
+    await supabase
+      .from("time_entries")
+      .update({
+        date: editingEntry.date,
+        hours: editingEntry.hours,
+        notes: editingEntry.notes,
+      })
+      .eq("id", editingEntry.id)
+
+    setEditingEntry(null)
+    fetchEntries(user.email)
+  }
+
+  const handleSubmitTimesheet = async () => {
+    const userName = allowedUsers[user.email]
+
+    await supabase
+      .from("time_entries")
+      .update({ status: "Submitted" })
+      .eq("name", userName)
+
+    fetchEntries(user.email)
+  }
+
   const totalHours = entries.reduce(
     (sum, entry) => sum + Number(entry.hours || 0),
     0
   )
 
-  if (loading) {
-    return <div className="min-h-screen bg-[#c6dbdc]" />
-  }
+  if (loading) return <div />
 
   return (
-    <div className="min-h-screen bg-[#c6dbdc] text-black">
-      <Navbar />
+    <div className="p-6">
 
-      <div className="max-w-4xl mx-auto p-6">
-        <div className="bg-white p-6 rounded-xl shadow-xl border">
-
-          <h1 className="text-2xl font-semibold mb-4">
-            My Overtime
-          </h1>
-
-          {/* ✅ ADD ENTRY */}
-          <div className="mb-6 grid grid-cols-5 gap-2">
-            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="border p-2 rounded"/>
-            <select value={type} onChange={(e) => setType(e.target.value)} className="border p-2 rounded">
-              <option value="">Type</option>
-              <option value="Pre-Shift">Pre-Shift</option>
-              <option value="Post-Shift">Post-Shift</option>
-              <option value="Night Shift">Night Shift</option>
-              <option value="Weekend HC">Weekend HC</option>
-              <option value="Weekend Shift">Weekend Shift</option>
-              <option value="Weekend Release">Weekend Release</option>
-              <option value="Weekend Patching">Weekend Patching</option>
-              <option value="Holiday Shift">Holiday Shift</option>
-            </select>
-            <input type="number" placeholder="Hours" value={hours} onChange={(e) => setHours(e.target.value)} className="border p-2 rounded"/>
-            <input placeholder="Notes" value={notes} onChange={(e) => setNotes(e.target.value)} className="border p-2 rounded"/>
-            <button onClick={handleAddEntry} className="bg-[#40948d] text-white rounded">Add</button>
-          </div>
-
-          {/* ✅ FILTERS */}
-          <div className="mb-4 grid grid-cols-3 gap-3">
-
-            <input type="month" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} className="border p-2 rounded"/>
-
-            <select value={selectedType} onChange={(e) => setSelectedType(e.target.value)} className="border p-2 rounded">
-              <option value="All">All Types</option>
-              <option value="Pre-Shift">Pre-Shift</option>
-              <option value="Post-Shift">Post-Shift</option>
-              <option value="Night Shift">Night Shift</option>
-              <option value="Weekend HC">Weekend HC</option>
-              <option value="Weekend Shift">Weekend Shift</option>
-              <option value="Weekend Release">Weekend Release</option>
-              <option value="Weekend Patching">Weekend Patching</option>
-              <option value="Holiday Shift">Holiday Shift</option>
-            </select>
-
-            {/* ✅ CATEGORY FILTER */}
-            <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} className="border p-2 rounded">
-              <option value="All">All Categories</option>
-              <option value="Weekday OT">Weekday OT</option>
-              <option value="Night OT">Night OT</option>
-              <option value="Weekend OT">Weekend OT</option>
-              <option value="Holiday OT">Holiday OT</option>
-            </select>
-
-          </div>
-
-          <div className="mb-4 text-lg">
-            Total Hours: <strong>{totalHours}</strong>
-          </div>
-
-          {/* ✅ TABLE */}
-          <table className="w-full text-sm border">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="p-2">Date</th>
-                <th className="p-2">Type</th>
-                <th className="p-2">Category</th>
-                <th className="p-2">Hours</th>
-                <th className="p-2">Notes</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {entries.map((entry) => (
-                <tr key={entry.id} className="border-t">
-                  <td className="p-2">{entry.date}</td>
-                  <td className="p-2">{entry.type}</td>
-                  <td className="p-2">{getCategory(entry.type)}</td>
-                  <td className="p-2">{entry.hours}</td>
-                  <td className="p-2">{entry.notes}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          {message && (
-            <p className="text-sm mt-3 text-center">{message}</p>
-          )}
-
-        </div>
+      {/* ✅ ADD ENTRY */}
+      <div className="grid grid-cols-5 gap-2 mb-4">
+        <input type="date" value={date} onChange={(e)=>setDate(e.target.value)} />
+        <select value={type} onChange={(e)=>setType(e.target.value)}>
+          <option value="">Type</option>
+          <option value="Post-Shift">Post-Shift</option>
+          <option value="Night Shift">Night Shift</option>
+        </select>
+        <input type="number" value={hours} onChange={(e)=>setHours(e.target.value)} />
+        <input value={notes} onChange={(e)=>setNotes(e.target.value)} />
+        <button onClick={handleAddEntry}>Add</button>
       </div>
+
+      {/* ✅ HEADER */}
+      <div className="flex justify-between mb-4">
+        <div>Total Hours: {totalHours}</div>
+        <button onClick={()=>setShowConfirm(true)}>Submit</button>
+      </div>
+
+      {/* ✅ TABLE */}
+      <table>
+        <thead>
+          <tr>
+            <th onClick={()=>handleSort("date")}>Date</th>
+            <th>Type</th>
+            <th>Category</th>
+            <th onClick={()=>handleSort("hours")}>Hours</th>
+            <th>Notes</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {entries.map(e=>(
+            <tr key={e.id}>
+              <td>{e.date}</td>
+              <td>{e.type}</td>
+              <td>{getCategory(e.type)}</td>
+              <td>{e.hours}</td>
+              <td>{e.notes}</td>
+              <td>
+                <button onClick={()=>setEditingEntry(e)}>Edit</button>
+                <button onClick={()=>handleDelete(e.id)}>Delete</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
     </div>
   )
 }
